@@ -1,0 +1,1794 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Archivos ASTER - Material desbloqueable, notas de Hall Varrow, archivos corruptos y conexion espectral.">
+  <title>ASTER | Archivos</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ── VAULT / PASSWORD GATE ── */
+    .vault-gate {
+      position: relative;
+      margin: var(--space-xl) 0;
+      background: rgba(0,5,0,.95);
+      border: 1px solid rgba(57,255,20,.25);
+      padding: var(--space-xl);
+      text-align: center;
+      overflow: hidden;
+    }
+    .vault-gate::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(57,255,20,.015) 2px, rgba(57,255,20,.015) 4px
+      );
+      pointer-events: none;
+    }
+    .vault-gate__icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+      display: block;
+      filter: drop-shadow(0 0 12px rgba(57,255,20,.4));
+    }
+    .vault-gate__title {
+      font-family: var(--font-imperial);
+      font-size: clamp(1.4rem,3vw,2.2rem);
+      color: var(--cream);
+      margin-bottom: var(--space-sm);
+    }
+    .vault-gate__title span { color: var(--green-neon); }
+    .vault-gate__desc {
+      font-family: var(--font-code);
+      font-size: .78rem;
+      color: var(--green-dim);
+      margin-bottom: var(--space-lg);
+      line-height: 1.8;
+    }
+    .vault-gate__form {
+      display: flex;
+      gap: var(--space-sm);
+      max-width: 480px;
+      margin: 0 auto var(--space-md);
+    }
+    .vault-gate__input {
+      flex: 1;
+      background: rgba(0,10,0,.8);
+      border: 1px solid var(--green-dim);
+      padding: var(--space-md) var(--space-lg);
+      color: var(--green-neon);
+      font-family: var(--font-code);
+      font-size: .9rem;
+      outline: none;
+      letter-spacing: 2px;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .vault-gate__input:focus {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 20px var(--green-dim);
+    }
+    .vault-gate__input::placeholder { color: var(--green-dim); letter-spacing: 1px; }
+    .vault-gate__btn {
+      background: transparent;
+      border: 1px solid var(--green-neon);
+      color: var(--green-neon);
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-code);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      white-space: nowrap;
+    }
+    .vault-gate__btn:hover {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+      box-shadow: var(--shadow-neon);
+    }
+    .vault-gate__error {
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: #ff4444;
+      margin-top: var(--space-sm);
+      min-height: 1.2em;
+      transition: opacity .3s;
+    }
+    .vault-gate__hint {
+      font-family: var(--font-code);
+      font-size: .7rem;
+      color: var(--iron-gray);
+      margin-top: var(--space-md);
+    }
+
+    /* ── VAULT CONTENT (hidden until unlocked) ── */
+    .vault-content {
+      display: none;
+      animation: vaultReveal .8s ease forwards;
+    }
+    .vault-content.unlocked { display: block; }
+    @keyframes vaultReveal {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── UNLOCK SUCCESS BANNER ── */
+    .vault-success {
+      display: none;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--green-neon);
+      text-align: center;
+      padding: var(--space-md);
+      border: 1px solid var(--green-dim);
+      background: rgba(57,255,20,.05);
+      margin-bottom: var(--space-xl);
+      letter-spacing: 2px;
+    }
+    .vault-success.show { display: block; }
+
+    /* ── CARNET (ID card) ── */
+    .carnet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .carnet {
+      background: linear-gradient(135deg, rgba(26,20,10,.9), rgba(13,10,5,.95));
+      border: 1px solid var(--brass);
+      border-top: 4px solid var(--bronze);
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+      transition: all .3s;
+    }
+    .carnet:hover { transform: translateY(-3px); box-shadow: var(--shadow-brass); }
+    .carnet::after {
+      content: 'CLASIFICADO';
+      position: absolute;
+      top: 14px; right: -22px;
+      background: #ff4444;
+      color: #fff;
+      font-family: var(--font-code);
+      font-size: .55rem;
+      letter-spacing: 2px;
+      padding: 2px 28px;
+      transform: rotate(35deg);
+    }
+    .carnet--revoked::after { background: var(--iron-gray); content: 'REVOCADO'; }
+    .carnet__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(218,165,32,.2);
+      padding-bottom: var(--space-md);
+    }
+    .carnet__avatar {
+      width: 52px; height: 52px;
+      border: 2px solid var(--brass);
+      border-radius: 2px;
+      background: rgba(57,255,20,.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .carnet__name {
+      font-family: var(--font-imperial);
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 2px;
+    }
+    .carnet__role {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--brass);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .carnet__rows { font-size: .78rem; }
+    .carnet__row {
+      display: flex;
+      gap: var(--space-sm);
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(218,165,32,.07);
+    }
+    .carnet__key {
+      width: 110px;
+      flex-shrink: 0;
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--brass);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .carnet__val { color: var(--text-light); line-height: 1.5; }
+    .carnet__stamp {
+      margin-top: var(--space-md);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--iron-gray);
+      letter-spacing: 1px;
+    }
+
+    /* ── GENEALOGY TREE ── */
+    .tree {
+      margin: var(--space-lg) 0;
+      font-family: var(--font-code);
+      font-size: .8rem;
+      color: var(--green-dim);
+      line-height: 2;
+      padding: var(--space-lg);
+      background: rgba(0,5,0,.7);
+      border: 1px solid rgba(57,255,20,.15);
+      overflow-x: auto;
+    }
+    .tree-node {
+      display: inline-block;
+      padding: 4px 12px;
+      border: 1px solid;
+      border-radius: 2px;
+      font-size: .72rem;
+      letter-spacing: 1px;
+    }
+    .tree-node--imperial { border-color: var(--brass); color: var(--brass); }
+    .tree-node--suspect  { border-color: #ff4444; color: #ff4444; }
+    .tree-node--unknown  { border-color: var(--iron-gray); color: var(--iron-gray); }
+    .tree-node--neon     { border-color: var(--green-neon); color: var(--green-neon); }
+    .tree-line { color: var(--iron-gray); margin: 0 4px; }
+
+    /* ── AUDIO RECORD (fake) ── */
+    .audio-record {
+      background: rgba(0,5,0,.85);
+      border: 1px solid var(--green-dim);
+      margin: var(--space-md) 0;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .3s;
+    }
+    .audio-record:hover { border-color: var(--green-neon); }
+    .audio-record__bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(57,255,20,.05);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .audio-record__play {
+      width: 28px; height: 28px;
+      border: 1px solid var(--green-neon);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem;
+      color: var(--green-neon);
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+    .audio-record:hover .audio-record__play {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+    }
+    .audio-record__title {
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--green-neon);
+      flex: 1;
+    }
+    .audio-record__meta {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+    }
+    .audio-record__waveform {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: var(--space-sm) var(--space-lg);
+      height: 40px;
+    }
+    .audio-record__waveform span {
+      display: block;
+      width: 3px;
+      background: var(--green-dim);
+      border-radius: 2px;
+      transition: background .3s;
+    }
+    .audio-record:hover .audio-record__waveform span { background: var(--green-neon); }
+    .audio-record__transcript {
+      display: none;
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-code);
+      font-size: .78rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+      border-top: 1px dashed var(--green-dim);
+    }
+    .audio-record__transcript.show { display: block; }
+    .audio-record__transcript-label {
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ── SYMBOL GRID ── */
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .symbol-item {
+      padding: var(--space-lg);
+      background: rgba(13,13,10,.8);
+      border: 1px solid rgba(57,255,20,.15);
+      text-align: center;
+      transition: all .3s;
+    }
+    .symbol-item:hover {
+      border-color: var(--green-neon);
+      background: rgba(57,255,20,.04);
+    }
+    .symbol-item__glyph {
+      font-size: 2.2rem;
+      display: block;
+      margin-bottom: var(--space-sm);
+      filter: drop-shadow(0 0 8px rgba(57,255,20,.5));
+    }
+    .symbol-item__name {
+      font-family: var(--font-code);
+      font-size: .7rem;
+      color: var(--green-neon);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .symbol-item__desc {
+      font-size: .78rem;
+      color: var(--iron-light);
+      line-height: 1.6;
+    }
+
+    /* ── ASTERIA MENTION ── */
+    .asteria-block {
+      background: linear-gradient(135deg, rgba(13,5,0,.95), rgba(5,0,10,.9));
+      border: 1px solid rgba(201,109,31,.4);
+      border-left: 4px solid var(--copper);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .asteria-block::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 200px; height: 200px;
+      background: radial-gradient(ellipse, rgba(57,255,20,.06), transparent 70%);
+      pointer-events: none;
+    }
+    .asteria-block__label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--copper);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .asteria-block__label::before {
+      content: '⚠';
+      font-size: .9rem;
+    }
+    .asteria-block__title {
+      font-family: var(--font-imperial);
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: var(--space-md);
+    }
+    .asteria-block__body {
+      font-size: .88rem;
+      color: var(--iron-light);
+      line-height: 1.9;
+    }
+    .asteria-block__body strong { color: var(--bronze-light); }
+
+    /* shake on wrong pw */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-6px); }
+      80%      { transform: translateX(6px); }
+    }
+    .shake { animation: shake .4s ease; }
+
+    /* scan line on unlock */
+    @keyframes scanDown {
+      from { top: -4px; }
+      to   { top: 100%; }
+    }
+    .vault-scan {
+      position: absolute;
+      left: 0; top: -4px;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+      animation: scanDown .8s ease forwards;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════════
+       CORRUPTED FILE — CARD TRIGGER (nueva versión)
+    ══════════════════════════════════════════════ */
+    .corrupt-card {
+      position: relative;
+      cursor: pointer;
+      background: rgba(0,5,0,.9);
+      border: 1px solid rgba(57,255,20,.2);
+      border-left: 3px solid var(--green-neon);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      transition: border-color .3s, box-shadow .3s;
+      overflow: hidden;
+      user-select: none;
+    }
+    .corrupt-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 3px,
+        rgba(57,255,20,.012) 3px, rgba(57,255,20,.012) 6px
+      );
+      pointer-events: none;
+    }
+    .corrupt-card:hover {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 20px rgba(57,255,20,.1), inset 0 0 30px rgba(57,255,20,.03);
+    }
+    .corrupt-card__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .corrupt-card__id {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .corrupt-card__status {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,.4);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+      animation: statusBlink 2s infinite;
+    }
+    @keyframes statusBlink {
+      0%,100%{opacity:1} 50%{opacity:.4}
+    }
+    .corrupt-card__label {
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .corrupt-card__scramble {
+      font-family: var(--font-code);
+      font-size: .8rem;
+      color: var(--green-dim);
+      line-height: 1.9;
+      word-break: break-all;
+      letter-spacing: .5px;
+      min-height: 80px;
+    }
+    .corrupt-card__cta {
+      margin-top: var(--space-md);
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .corrupt-card__cta::before {
+      content: '▶';
+      color: var(--green-neon);
+      font-size: .7rem;
+    }
+    .corrupt-card__lock-icon {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      font-size: 1.1rem;
+      opacity: .4;
+    }
+
+    /* ══════════════════════════════════════════════
+       FULLSCREEN CORRUPTED PANEL (MODAL)
+    ══════════════════════════════════════════════ */
+    .corrupt-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(6px);
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .corrupt-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .corrupt-panel {
+      position: relative;
+      width: min(860px, 94vw);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: rgba(0,5,0,.97);
+      border: 1px solid rgba(57,255,20,.3);
+      border-top: 3px solid var(--green-neon);
+      box-shadow: 0 0 60px rgba(57,255,20,.12), 0 0 120px rgba(57,255,20,.05);
+      animation: panelSlideIn .35s ease forwards;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green-dim) transparent;
+    }
+    .corrupt-overlay.active .corrupt-panel {
+      animation: panelSlideIn .35s ease forwards;
+    }
+    @keyframes panelSlideIn {
+      from { transform: translateY(30px) scale(.97); opacity:0; }
+      to   { transform: translateY(0) scale(1); opacity:1; }
+    }
+    /* scan line effect on panel */
+    .corrupt-panel::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+      animation: panelScan 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes panelScan {
+      0%   { top: 0; opacity: .8; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* Panel top bar */
+    .corrupt-panel__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    .corrupt-panel__bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .corrupt-panel__dots {
+      display: flex;
+      gap: 5px;
+    }
+    .corrupt-panel__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .corrupt-panel__dot:nth-child(1) { background: #ff4444; }
+    .corrupt-panel__dot:nth-child(2) { background: var(--brass); }
+    .corrupt-panel__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .corrupt-panel__title {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .corrupt-panel__close {
+      background: transparent;
+      border: 1px solid rgba(255,68,68,.4);
+      color: #ff4444;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all .2s;
+    }
+    .corrupt-panel__close:hover {
+      background: #ff4444;
+      color: #000;
+    }
+
+    /* Panel body */
+    .corrupt-panel__body {
+      padding: var(--space-xl) var(--space-xl);
+    }
+
+    /* Panel header info */
+    .corrupt-panel__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.12);
+    }
+    .corrupt-panel__meta-id {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .corrupt-panel__meta-badge {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,.4);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+
+    /* The terminal-style content area inside the panel */
+    .corrupt-panel__terminal {
+      background: rgba(0,8,0,.8);
+      border: 1px solid rgba(57,255,20,.15);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: var(--space-lg);
+    }
+    .corrupt-panel__terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px var(--space-md);
+      background: rgba(57,255,20,.05);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .corrupt-panel__terminal-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green-neon);
+      box-shadow: 0 0 4px var(--green-neon);
+    }
+    .corrupt-panel__terminal-dot:nth-child(2) { background: var(--brass); box-shadow: 0 0 4px var(--brass); }
+    .corrupt-panel__terminal-dot:nth-child(3) { background: var(--iron-gray); box-shadow: none; }
+    .corrupt-panel__terminal-name {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+      margin-left: 4px;
+    }
+    .corrupt-panel__content {
+      padding: var(--space-lg);
+      font-family: var(--font-code);
+      font-size: .83rem;
+      color: var(--green-neon);
+      line-height: 2;
+    }
+    /* scrambled state: dim green */
+    .corrupt-panel__content.scrambled {
+      color: var(--green-dim);
+      user-select: none;
+    }
+    /* decrypted state */
+    .corrupt-panel__content.decrypted {
+      color: var(--green-neon);
+    }
+    .corrupt-panel__line {
+      display: block;
+      margin-bottom: 2px;
+      transition: color .2s;
+    }
+    .corrupt-panel__line::before { content: '> '; color: var(--green-dim); }
+    .corrupt-panel__line--warn { color: var(--brass); }
+    .corrupt-panel__line--warn::before { color: rgba(218,165,32,.5); }
+    .corrupt-panel__line--error { color: #ff4444; }
+    .corrupt-panel__line--error::before { color: rgba(255,68,68,.4); }
+    .corrupt-panel__line--dim { color: var(--green-dim); }
+
+    /* Password gate inside panel */
+    .corrupt-pw {
+      border-top: 1px solid rgba(57,255,20,.15);
+      padding: var(--space-lg);
+      text-align: center;
+    }
+    .corrupt-pw.hidden { display: none; }
+    .corrupt-pw__label {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-md);
+      display: block;
+    }
+    .corrupt-pw__form {
+      display: flex;
+      gap: 8px;
+      max-width: 360px;
+      margin: 0 auto var(--space-sm);
+    }
+    .corrupt-pw__input {
+      flex: 1;
+      background: rgba(0,10,0,.9);
+      border: 1px solid var(--green-dim);
+      padding: 10px 14px;
+      color: var(--green-neon);
+      font-family: var(--font-code);
+      font-size: .9rem;
+      outline: none;
+      letter-spacing: 4px;
+      text-align: center;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .corrupt-pw__input:focus {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 15px var(--green-dim);
+    }
+    .corrupt-pw__input::placeholder { letter-spacing: 2px; color: var(--green-dim); font-size: .75rem; }
+    .corrupt-pw__btn {
+      background: transparent;
+      border: 1px solid var(--green-neon);
+      color: var(--green-neon);
+      padding: 10px 18px;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      white-space: nowrap;
+    }
+    .corrupt-pw__btn:hover {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+      box-shadow: 0 0 15px var(--green-dim);
+    }
+    .corrupt-pw__error {
+      font-family: var(--font-code);
+      font-size: .7rem;
+      color: #ff4444;
+      min-height: 1.1em;
+      letter-spacing: 1px;
+    }
+    .corrupt-pw__hint {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--iron-gray);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+    /* success bar after decrypt */
+    .corrupt-pw__success {
+      display: none;
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-neon);
+      letter-spacing: 2px;
+      padding: 8px;
+      border: 1px solid rgba(57,255,20,.3);
+      background: rgba(57,255,20,.06);
+      text-align: center;
+    }
+    .corrupt-pw__success.show { display: block; }
+
+    /* decrypt progress bar */
+    .corrupt-decrypt-bar {
+      display: none;
+      height: 2px;
+      width: 100%;
+      background: rgba(57,255,20,.15);
+      margin: var(--space-sm) 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .corrupt-decrypt-bar.active { display: block; }
+    .corrupt-decrypt-bar__fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      background: var(--green-neon);
+      box-shadow: 0 0 8px var(--green-neon);
+      width: 0%;
+      transition: width .8s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <span class="loader__text">DESCIFRANDO ARCHIVOS...</span>
+    <div class="loader__bar"><div class="loader__progress"></div></div>
+  </div>
+  <div class="particles" id="particles"></div>
+  <div class="gear-container">
+    <div class="gear"><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div></div>
+    <div class="gear gear--small"><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div></div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav__logo">ASTER</a>
+    <div class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="index.html" class="nav__link">Inicio</a></li>
+      <li><a href="terminal.html" class="nav__link">Terminal</a></li>
+      <li><a href="laboratorio.html" class="nav__link">Laboratorio</a></li>
+      <li><a href="archivos.html" class="nav__link active">Archivos</a></li>
+    </ul>
+  </nav>
+
+  <header class="page-header">
+    <p class="page-header__breadcrumb"><a href="index.html">ASTER</a> / ARCHIVOS</p>
+    <h1 class="page-header__title glitch" data-text="Archivos">Archivos</h1>
+    <p class="page-header__breadcrumb">Acceso concedido. Zona de hackeo activa.</p>
+    <p class="page-header__desc">Está a punto de interactuar con archivos corruptos pertenecientes a la base de datos imperial desarrollada por la Dra. Selene Olrac para uso exclusivo del personal autorizado. El contenido no ha sido verificado. Proceda con cautela.</p>
+  </header>
+
+  <main class="section">
+
+    <!-- ══════════════════════════════════
+         ARCHIVOS CORRUPTOS (public) — NUEVA LÓGICA
+    ══════════════════════════════════ -->
+    <div class="section__header reveal">
+      <span class="section__label">// Archivos Corruptos</span>
+      <p class="section__desc">Fragmentos cifrados de la base de datos imperial para personal perteneciente al concejo. Acceso restringido: requiere descifrado.</p>
+    </div>
+
+    <!-- CARD 001 -->
+    <div class="corrupt-card reveal" onclick="openCorruptPanel('panel-001')">
+      <span class="corrupt-card__lock-icon">🔐</span>
+      <div class="corrupt-card__header">
+        <span class="corrupt-card__id">NODO-CRP-001</span>
+        <span class="corrupt-card__status">CIFRADO</span>
+      </div>
+      <span class="corrupt-card__label">▓▓▓ ARCHIVO CORRUPTO 001 ▓▓▓</span>
+      <div class="corrupt-card__scramble" id="scramble-001"></div>
+      <div class="corrupt-card__cta">CLICK PARA ACCEDER</div>
+    </div>
+
+    <!-- CARD 002 -->
+    <div class="corrupt-card reveal" onclick="openCorruptPanel('panel-002')" style="margin-top: var(--space-md)">
+      <span class="corrupt-card__lock-icon">🔐</span>
+      <div class="corrupt-card__header">
+        <span class="corrupt-card__id">NODO-CRP-002</span>
+        <span class="corrupt-card__status">CIFRADO</span>
+      </div>
+      <span class="corrupt-card__label">▓▓▓ ARCHIVO CORRUPTO 002 ▓▓▓</span>
+      <div class="corrupt-card__scramble" id="scramble-002"></div>
+      <div class="corrupt-card__cta">CLICK PARA ACCEDER</div>
+    </div>
+
+    <!-- CARD 003 -->
+    <div class="corrupt-card reveal" onclick="openCorruptPanel('panel-003')" style="margin-top: var(--space-md)">
+      <span class="corrupt-card__lock-icon">🔐</span>
+      <div class="corrupt-card__header">
+        <span class="corrupt-card__id">NODO-CRP-003</span>
+        <span class="corrupt-card__status">CIFRADO</span>
+      </div>
+      <span class="corrupt-card__label">▓▓▓ ARCHIVO CORRUPTO 003 ▓▓▓</span>
+      <div class="corrupt-card__scramble" id="scramble-003"></div>
+      <div class="corrupt-card__cta">CLICK PARA ACCEDER</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════════════
+         NOTAS DE HALL VARROW (public)
+    ══════════════════════════════════ -->
+    <div class="section__header reveal">
+      <span class="section__label">// Notas de Hall Varrow</span>
+      <p class="section__desc">Fragmentos recuperados de los registros personales de Hall Varrow, ex-científico imperial desaparecido en circunstancias no esclarecidas. Recopilación: Dr.ª Selene Olrac, Archivo Independiente de Aster, Ciclo 881.</p>
+    </div>
+
+    <div class="terminal reveal">
+      <div class="terminal__bar">
+        <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+        <span class="terminal__title">HALL_VARROW_PERSONAL_LOG.enc // FRAGMENTO PÚBLICO</span>
+      </div>
+      <div class="terminal__body">
+        <p class="terminal__line">Entrada 0047 | Fecha: [CORRUPTA]</p>
+        <p class="terminal__line">He confirmado mis sospechas. La sustancia no es inerte.</p>
+        <p class="terminal__line">Reacciona a la presencia humana. No solo químicamente.</p>
+        <p class="terminal__line">He observado patrones... como si intentara comunicarse.</p>
+        <p class="terminal__line--warn">Entrada 0048 | Fecha: [CORRUPTA]</p>
+        <p class="terminal__line">El Consejo me ha retirado el acceso al laboratorio 7.</p>
+        <p class="terminal__line">Dicen que mis "hallazgos" son "interpretaciones erróneas".</p>
+        <p class="terminal__line">Pero he guardado copias. Las he escondido donde no buscarán.</p>
+        <p class="terminal__line--error">Entrada 0049 | Fecha: [CORRUPTA]</p>
+        <p class="terminal__line--error">Si alguien lee esto: el Domo no nos protege.</p>
+        <p class="terminal__line--error">El Domo nos contiene.</p>
+        <p class="terminal__line--dim">[FIN DEL REGISTRO RECUPERABLE — MÁS FRAGMENTOS REQUIEREN ACCESO CLASE-V]</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════════════
+         PROPAGANDA IMPERIAL (public)
+    ══════════════════════════════════ -->
+    <div class="section__header reveal">
+      <span class="section__label">// Propaganda Imperial</span>
+      <p class="section__desc"> Registros censurados y material propagandístico archivado por la Dra. Selene Olrac para su análisis y distribución interna.</p>
+    </div>
+
+    <div class="card-grid reveal">
+      <div class="card">
+        <img src="assets/img/img_propaganda2.png" alt="Propaganda del Domo" class="card__image">
+        <div class="card__body">
+          <span class="card__tag">Propaganda</span>
+          <h3 class="card__title">El Domo te Protege</h3>
+          <p class="card__text">"Fuera del Domo solo hay muerte. Dentro, el Imperio garantiza tu supervivencia. Sé leal. Sé obediente. Sé útil." — Cartel oficial, Ciclo 847.</p>
+          <a href="laboratorio.html" class="btn btn--download" style="margin-top: var(--space-md); display:inline-flex;">
+            Acceder al Laboratorio →
+          </a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="assets/img/img_propaganda1.png" alt="Propaganda industrial" class="card__image">
+        <div class="card__body">
+          <span class="card__tag">Censurado</span>
+          <h3 class="card__title">Trabaja. Obedece. Prospera.</h3>
+          <p class="card__text">"Cada engranaje tiene su lugar. Tu lugar está en las minas. Tu sacrificio alimenta a tus hermanos. El Imperio agradece tu servicio." — Emisión radiofónica diaria.</p>
+          <a href="laboratorio.html" class="btn btn--download" style="margin-top: var(--space-md); display:inline-flex;">
+            Acceder al Laboratorio →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ══════════════════════════════════
+         VAULT GATE — MATERIAL CLASIFICADO
+    ══════════════════════════════════ -->
+    <div class="section__header reveal">
+      <span class="section__label">// Acceso Restringido</span>
+      <h2 class="section__title">Material <span>Clasificado</span></h2>
+      <p class="section__desc">Acceso a repositorio de nivel máximo restringido.
+La clave ha sido fragmentada y oculta en registros vinculados a ASTER.
+Intentar reconstrucción puede comprometer la integridad del sistema.</p>
+    </div>
+
+    <div class="vault-gate reveal" id="vaultGate">
+      <span class="vault-gate__icon">🔒</span>
+      <h3 class="vault-gate__title">Bóveda <span>Clase-V</span></h3>
+      <p class="vault-gate__desc">
+        > SISTEMA: Archivo sellado por Orden Imperial 0091-C<br>
+        > ACCESO: Solo personal con código de acceso autorizado<br>
+        > ADVERTENCIA: Los intentos fallidos son registrados y reportados
+      </p>
+      <div class="vault-gate__form">
+        <input type="text" class="vault-gate__input" id="vaultInput" placeholder="Introduzca contraseña" autocomplete="off" spellcheck="false">
+        <button class="vault-gate__btn" id="vaultBtn">▶ Verificar</button>
+      </div>
+      <p class="vault-gate__error" id="vaultError"></p>
+      <p class="vault-gate__hint">> Pista: Dos palabras.</p>
+    </div>
+
+    <!-- ══════════════════════════════════
+         VAULT CONTENT — UNLOCKED
+    ══════════════════════════════════ -->
+    <div class="vault-content" id="vaultContent">
+      <div class="vault-success show" id="vaultSuccess">
+        > ACCESO CONCEDIDO — BIENVENIDO AL REPOSITORIO CLASE-V // PROTOCOLO ASTERIA ACTIVO
+      </div>
+
+      <!-- 1.1 Fragmentos de las notas de Hall -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.1</span>
+        <h2 class="section__title">Notas de Hall — <span>Fragmentos Completos</span></h2>
+        <p class="section__desc">Recopilación completa de los registros cifrados de Hall Varrow. Descifrado por Selene Olrac con autorización de la célula Espectro. Ciclo 882.</p>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal__bar">
+          <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+          <span class="terminal__title">HALL_VARROW_FULL_LOG_DECRYPTED.enc</span>
+        </div>
+        <div class="terminal__body">
+          <p class="terminal__line">Entrada 0031 | Ciclo 871, Mes 3</p>
+          <p class="terminal__line">Me asignaron al proyecto de refinamiento del VX-13. El Veridium, cuando se procesa</p>
+          <p class="terminal__line">bajo calor controlado, produce un compuesto que actúa directamente</p>
+          <p class="terminal__line">sobre el hipocampo. Alegría. Relajación. Olvido selectivo. Adormecimiento.</p>
+          <p class="terminal__line">El Consejo lo llama "estabilizador social". Yo lo llamo por lo que es, una droga.</p>
+          <p class="terminal__line--warn">Entrada 0038 | Ciclo 872, Mes 1</p>
+          <p class="terminal__line">He perfeccionado el refinamiento. Ya no provoca desfiguración en dosis bajas.</p>
+          <p class="terminal__line">El Consejo está satisfecho. Yo no puedo dormir.</p>
+          <p class="terminal__line">Sé lo que van a hacer con esto. Lo sé y lo hice de todos modos.</p>
+          <p class="terminal__line--warn">Entrada 0041 | Ciclo 872, Mes 4</p>
+          <p class="terminal__line">Vi los informes. Distribuyen la sustancia en los suburbios sur y este.</p>
+          <p class="terminal__line">Los trabajadores dejan de rebelarse. Los migrantes "se adaptan".</p>
+          <p class="terminal__line">Cada vez más personas de los suburbios me buscan para obtener más de VX-13. Yo no puedo negarme.</p>
+          <p class="terminal__line">Yo no puedo negarme.</p>
+          <p class="terminal__line--error">Entrada 0044 | Ciclo 872, Mes 7</p>
+          <p class="terminal__line--error">Los experimentos con tejido vivo han comenzado.</p>
+          <p class="terminal__line--error">Quieren llevar el compuesto más lejos. Quieren reescribir memoria permanente.</p>
+          <p class="terminal__line--error">Quieren resucitar a Asteria. Dios. Quieren resucitarla.</p>
+          <p class="terminal__line--error">Dicen que están en etapas avanzadas. Si esto sale mal, lo que salga de ese proceso no será humano.</p>
+
+          <p class="terminal__line--dim">Entrada 0050 | Ciclo 872, Mes 9</p>
+          <p class="terminal__line">He robado las fórmulas. El método de refinamiento completo. No sé que haré con esta información.</p>
+          <p class="terminal__line">Me buscan. Necesito salir de Aster.</p>
+          <p class="terminal__line">Encontraré a Linet. No sé cómo va a reaccionar. No la culpo si me odia.</p>
+          <p class="terminal__line--dim">[FIN DEL REGISTRO — ARCHIVADO POR SELENE OLRAC, INVESTIGADORA INDEPENDIENTE]</p>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- 1.2 Carnets de científicos -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.2</span>
+        <h2 class="section__title">Registros Científicos — <span>Carnets Imperiales</span></h2>
+        <p class="section__desc"> Registros de identificación emitidos por el Alto Consejo de Aster. Perfiles de alto valor estratégico debido a sus contribuciones científicas y desarrollos tecnológicos.
+Estado actual: revocados tras deserción.</p>
+      </div>
+
+      <div class="carnet-grid">
+        <div class="carnet carnet--revoked">
+          <div class="carnet__header">
+            <img src="assets/img/carnet_hall.png" alt="Hall Varrow" class="carnet__avatar" style="object-fit:cover;">
+            <div>
+              <div class="carnet__name">Hall Varrow</div>
+              <div class="carnet__role">Científico Clase-A // Química de Minerales</div>
+            </div>
+          </div>
+          <div class="carnet__rows">
+            <div class="carnet__row"><span class="carnet__key">ID Imperial</span><span class="carnet__val">CV-0441-HV</span></div>
+            <div class="carnet__row"><span class="carnet__key">Adscripción</span><span class="carnet__val">Laboratorio 7 — Dirección de Estabilidad Cognitiva</span></div>
+            <div class="carnet__row"><span class="carnet__key">Clearance</span><span class="carnet__val">Clase-A (Revocado, Ciclo 872)</span></div>
+            <div class="carnet__row"><span class="carnet__key">Especialidad</span><span class="carnet__val">Creación y Desarrollo del VX-13</span></div>
+            <div class="carnet__row"><span class="carnet__key">Estado</span><span class="carnet__val" style="color:#ff4444">DESERTOR — BÚSQUEDA ACTIVA</span></div>
+          </div>
+          <p class="carnet__stamp">Emitido: Ciclo 865 // Revocado: Ciclo 872 // Archivado: Senne Olrac</p>
+        </div>
+
+        <div class="carnet">
+          <div class="carnet__header">
+            <img src="assets/img/carnet_yvaine.png" alt="Dra. Yvaine Corsel" class="carnet__avatar" style="object-fit:cover;">
+            <div>
+              <div class="carnet__name">Dra. Yvaine Corsel</div>
+              <div class="carnet__role">Científica Clase-B // Neurología Aplicada</div>
+            </div>
+          </div>
+          <div class="carnet__rows">
+            <div class="carnet__row"><span class="carnet__key">ID Imperial</span><span class="carnet__val">CN-0319-YC</span></div>
+            <div class="carnet__row"><span class="carnet__key">Adscripción</span><span class="carnet__val">Laboratorio 7 — Dirección de Estabilidad Cognitiva</span></div>
+            <div class="carnet__row"><span class="carnet__key">Clearance</span><span class="carnet__val">Clase-B (Vigente)</span></div>
+            <div class="carnet__row"><span class="carnet__key">Especialidad</span><span class="carnet__val">Reescritura mnémica mediante el Veridium.</span></div>
+            <div class="carnet__row"><span class="carnet__key">Nota</span><span class="carnet__val">Colaboró con Varrow en las fases 1 y 2 del proyecto</span></div>
+          </div>
+          <p class="carnet__stamp">Emitido: Ciclo 868 // Estado: ACTIVO — BAJO VIGILANCIA</p>
+        </div>
+
+        <div class="carnet">
+          <div class="carnet__header">
+            <img src="assets/img/carnet_ereth.png" alt="Dr. Tomas Ereth" class="carnet__avatar" style="object-fit:cover;">
+            <div>
+              <div class="carnet__name">Dr. Tomas Ereth</div>
+              <div class="carnet__role">Científico Clase-A // Biología Sintética</div>
+            </div>
+          </div>
+          <div class="carnet__rows">
+            <div class="carnet__row"><span class="carnet__key">ID Imperial</span><span class="carnet__val">CB-0507-TE</span></div>
+            <div class="carnet__row"><span class="carnet__key">Adscripción</span><span class="carnet__val">Laboratorio 7 — División Tanatológica</span></div>
+            <div class="carnet__row"><span class="carnet__key">Clearance</span><span class="carnet__val">Clase-A (Revocado post-mortem)</span></div>
+            <div class="carnet__row"><span class="carnet__key">Especialidad</span><span class="carnet__val">Fusión mineral-tejido, reanimación celular</span></div>
+            <div class="carnet__row"><span class="carnet__key">Estado</span><span class="carnet__val" style="color:var(--iron-gray)">FALLECIDO — Ciclo 873, Lab-7 [Causa: Accidente de exposición]</span></div>
+          </div>
+          <p class="carnet__stamp">Emitido: Ciclo 860 // Archivado: Senne Olrac</p>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- 1.3 [REGISTRO NO INDEXADO — ORIGEN DESCONOCIDO] -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.3</span>
+        <h2 class="section__title">[ <span>ORIGEN DESCONOCIDO</span> ]</h2>
+        <p class="section__desc">Autoría: investigadora Selene Olrac. Ciclo 282.</p>
+      </div>
+
+      <div class="node">
+        <div class="node__header">
+          <span class="node__id">ANÁLISIS-POL-CLASIFICADO</span>
+          <span class="node__status" style="color:#ff4444; border-color:#ff444480">MÁXIMO SECRETO</span>
+        </div>
+        <h3 class="node__title">El Imperio podría correr peligro si esta información llega a confirmarse</h3>
+        <div class="node__content">
+          <p>Existen indicios de que el Imperio de Aster no se consolidó como una respuesta natural a las condiciones del mundo, sino como una estructura diseñada en torno al control del Veridium y la necesidad de sostener un relato coherente en el tiempo. Elementos considerados fundamentales —como el linaje, el Domo o los sistemas de formación— no aparecen de forma consistente en los registros más antiguos, y su formalización coincide con la estabilización del modelo imperial. Algunos fragmentos sugieren que estos componentes cumplen funciones que exceden su propósito declarado, regulando no solo el espacio y los recursos, sino también la memoria, la identidad y los límites de lo que puede ser conocido. La integridad de estos datos no ha sido verificada. Su existencia, sin embargo, plantea una posibilidad que el sistema no contempla: que el origen del Imperio no pueda sostenerse fuera de su propia narrativa.</p>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- 1.4 Árbol Genealógico -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.4</span>
+        <h2 class="section__title">El Linaje — <span>Árbol Genealógico</span></h2>
+        <p class="section__desc">Reconstrucción basada en registros de la Bóveda de los Nombres, filtrados por fuente anónima. Verificación parcial. Selene Olrac, Ciclo 883.</p>
+      </div>
+
+      <div class="node">
+        <div class="node__header">
+          <span class="node__id">GENEALOGÍA-IMP</span>
+          <span class="node__status">RECONSTRUCCIÓN PARCIAL</span>
+        </div>
+        <h3 class="node__title">Nueve Generaciones del Linaje Imperial</h3>
+        <div class="node__content">
+          <p>Si este registro llegara a ser verificado, comprometería la base misma del orden imperial.</p>
+          <p>El llamado linaje puro no corresponde a una continuidad originaria dentro de Aster. Los primeros asentamientos de la línea Velk no encontraron un territorio vacío, sino poblaciones previas que fueron progresivamente desplazadas o errradicadas durante la consolidación inicial del dominio.</p>
+          <p>Los registros fundacionales que documentaban estos eventos han sido sistemáticamente alterados o eliminados. La noción de pureza no aparece en los archivos más antiguos: surge posteriormente, coincidiendo con la institucionalización del poder imperial.</p>
+        </div>
+        <div class="tree" style="margin: var(--space-lg)">
+          <div style="text-align:center; margin-bottom: 12px;">
+            <span class="tree-node tree-node--imperial">ASTERIA VELK</span>
+            <span style="font-family:var(--font-code);font-size:.6rem;color:var(--copper);margin-left:8px">// Fundadora — Siglo I del Domo</span>
+          </div>
+          <div style="text-align:center; color:var(--iron-gray); font-size:1.2rem; line-height:1">│</div>
+          <div style="text-align:center; margin:4px 0">
+            <span class="tree-node tree-node--imperial">THARION VELK SOBERANO II</span>
+            <span class="tree-line">──</span>
+            <span class="tree-node tree-node--unknown">Consorte Liora Senval</span>
+          </div>
+          <div style="text-align:center; color:var(--iron-gray); font-size:1.2rem; line-height:1">│</div>
+          <div style="text-align:center; margin:4px 0">
+            <span class="tree-node tree-node--imperial">VAREK VELK SOBERANO III</span>
+            <span class="tree-line">──</span>
+            <span class="tree-node tree-node--unknown">Consorte [NOMBRE SELLADO]</span>
+          </div>
+          <div style="text-align:center; color:var(--iron-gray); font-size:.9rem; line-height:1; margin: 4px 0">· · · generaciones IV–VII · · ·</div>
+          <div style="text-align:center; margin:4px 0">
+            <span class="tree-node tree-node--imperial"> Azenya Velk SOBERANO VIII</span>
+            <span class="tree-line">──</span>
+            <span class="tree-node tree-node--suspect">Dra. Mael Voss [RELACIÓN: DESCONOCIDA]</span>
+          </div>
+          <div style="text-align:center; color:var(--iron-gray); font-size:1.2rem; line-height:1">│</div>
+          <div style="text-align:center; margin:4px 0">
+            <span class="tree-node tree-node--imperial">SOBERANO ACTUAL [NOMBRE CENSURADO]</span>
+            <span style="font-family:var(--font-code);font-size:.6rem;color:#ff4444;margin-left:8px">// Generación IX</span>
+          </div>
+          <div style="text-align:center; color:var(--iron-gray); font-size:1.2rem; line-height:1">│</div>
+          <div style="text-align:center; margin: 4px 0">
+            <span class="tree-node tree-node--neon">? — LÍNEA INTERRUMPIDA REQUIERE DE MAYOR MAYOR PARA ACCEDER A ESTA INFORMACIÓN</span>
+          </div>
+          <div style="text-align:center; margin-top:16px; font-family:var(--font-code); font-size:.62rem; color:var(--iron-gray)">
+            NOTA: Los registros anteriores a la consolidación Velk son fragmentarios, pero coinciden en algo: Aster no estaba vacía. — Y. Corsel
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- 1.5 VX-13 -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.5</span>
+        <h2 class="section__title">VX-13 — <span>Expediente Completo</span></h2>
+        <p class="section__desc">Compilación de versiones oficiales, registros clandestinos y grabaciones de campo. Coordinación: célula Espectro.</p>
+      </div>
+
+      <div class="compare">
+        <div class="compare__side compare__side--official">
+          <span class="compare__label">Versión Oficial — Documentos</span>
+          <h4 class="node__title" style="font-size:1.1rem;">Informe Técnico de Sustancia VX-13</h4>
+          <div class="node__content">
+            <p>La sustancia VX-13 corresponde a un compuesto desarrollado por el Laboratorio 7, bajo la Dirección de Estabilidad Cognitiva, como parte de un programa orientado al control conductual en zonas suburbanas. El proyecto fue liderado por Hall Varrow y se integró dentro de las estrategias imperiales para la regulación social fuera del Domo. VX-13 es distribuida de forma encubierta en múltiples presentaciones, incluyendo somníferos, sustancias recreativas y placebos comercializados como tratamientos médicos, sin conocimiento explícito de la población consumidora. Su presencia ha sido normalizada como un producto cotidiano en los suburbios, mientras que su circulación permanece estrictamente restringida dentro del Domo, generando una asimetría deliberada en el acceso y la información entre ambas poblaciones.</p>
+          </div>
+        </div>
+        <div class="compare__side compare__side--clandestine">
+          <span class="compare__label">Versión Suburbana — Registro de Campo</span>
+          <h4 class="node__title" style="font-size:1.1rem;">Registro Cultural Informal</h4>
+          <div class="node__content">
+            <p>En los sectores periféricos, la sustancia VX-13 es conocida bajo el nombre de “Aurora” y se percibe como un producto de uso cotidiano asociado al bienestar físico y emocional. Su distribución en formatos accesibles ha favorecido una aceptación generalizada entre la población, que la considera segura dentro de los estándares habituales de consumo. No obstante, reportes recientes evidencian un incremento sostenido de casos de dependencia severa, acompañados de efectos adversos progresivos que incluyen alteraciones físicas visibles, episodios de abstinencia extrema con manifestaciones conductuales desestabilizadas, desorientación cognitiva y pérdida parcial o total de memoria autobiográfica. A pesar de estos indicadores, la percepción colectiva en los suburbios continúa siendo predominantemente positiva, lo que sugiere una disonancia entre la experiencia reportada y la narrativa dominante en torno al compuesto.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audios clandestinos -->
+      <h4 style="font-family:var(--font-imperial);color:var(--cream);margin: var(--space-lg) 0 var(--space-md)">Grabaciones de campo</h4>
+
+      <div class="audio-record" onclick="toggleAudio(this)">
+        <audio class="audio-record__player" src="assets/audio/audio1_minero_anonimo.mp3" preload="none"></audio>
+          <div class="audio-record__bar">
+          <div class="audio-record__play">▶</div>
+          <span class="audio-record__title">REC_CAMPO_047 — Minero anónimo, Mina 12</span>
+          <span class="audio-record__meta">2:10 // Ciclo 579</span>
+          </div>
+        <div class="audio-record__waveform" id="wv1"></div>
+        <div class="audio-record__transcript">
+        <p class="audio-record__transcript-label">> Informe de Observación</p>
+        <p>Se documenta el caso de un individuo masculino, trabajador del sector minero, con historial de consumo prolongado (estimado en más de diez años) de la sustancia VX-13 en su variante distribuida como “Aurora”. Los primeros indicios de afectación se manifestaron como fallas cognitivas leves, específicamente en la retención de información rutinaria y altamente especializada, atribuibles inicialmente a fatiga laboral. Sin embargo, el cuadro progresó hacia una degradación severa de la memoria, incluyendo pérdida de identidad personal, desorientación espacial y reconocimiento limitado de su entorno inmediato.</p>
+        <p>De forma paralela, se registraron alteraciones fisiológicas visibles: oscurecimiento y engrosamiento de las venas con tonalidad verdosa, palidez dérmica pronunciada y deterioro muscular facial progresivo, derivando en desfiguración parcial y posteriormente avanzada. En etapas tardías, el sujeto presentó reducción significativa del lenguaje articulado, sustituido por vocalizaciones no estructuradas, así como signos de desconexión cognitiva severa.</p>
+        <p>El consumo continuado fue justificado por el propio individuo como necesario para mantener una sensación de claridad mental, lo que sugiere un alto grado de dependencia psicológica además de fisiológica. El caso concluye con la desaparición no documentada del sujeto tras alcanzar un estado crítico de transformación física y cognitiva. No se registran investigaciones posteriores ni protocolos de seguimiento, lo que indica una posible omisión sistemática en el manejo de individuos afectados en fases avanzadas.</p>
+        </div>
+    </div>
+
+      <div class="audio-record" onclick="toggleAudio(this)" style="margin-top:var(--space-sm)">
+        <audio class="audio-record__player" src="assets/audio/audio2_yvaine_corsel.mp3" preload="none"></audio>
+        <div class="audio-record__bar">
+          <div class="audio-record__play">▶</div>
+          <span class="audio-record__title">REC_CAMPO_051 — Dr.ª Yvaine Corsel, El refinamiento del VX-13</span>
+          <span class="audio-record__meta">1:31 // Ciclo 880</span>
+        </div>
+      <div class="audio-record__waveform" id="wv2"></div>
+      <div class="audio-record__transcript">
+        <p class="audio-record__transcript-label">> Transcripción</p>
+        <p>"…El VX-13 en su estado bruto es insoportable para cualquier organismo humano. La exposición directa provoca necrosis celular acelerada y colapso cognitivo en cuestión de horas. Lo que Varrow hizo—y es aquí donde radica lo verdaderamente inquietante—fue disminuir el umbral de toxicidad hasta convertirlo en algo… estable. Consumible.</p>
+        <p>Las primeras variantes refinadas apenas daban un margen de cuarenta horas antes de que la deformación física se volviera irreversible. La formulación actual, la suya, permite más de una década de uso continuo sin manifestaciones visibles en la superficie. A simple vista, parecen sanos. Funcionales.</p>
+        <p>Pero el costo está en otra parte. El olvido es el primer síntoma. Pequeño, casi imperceptible. Recuerdos traumáticos… luego conocimientos culturales, vínculos, nombres, historias. Un vaciamiento metódico, quirúrgico. A veces me pregunto si prolongar esa pérdida lenta, silenciosa, es realmente más compasivo que dejar que la desfiguración los consuma de inmediato."</p>
+      </div>
+    </div>
+
+      <!-- Efectos visibles -->
+      <h4 style="font-family:var(--font-imperial);color:var(--cream);margin: var(--space-lg) 0 var(--space-md)">Efectos visibles — Documentación de campo</h4>
+      <div class="node">
+        <div class="node__content">
+          <p>El consumo prolongado de Aurora produce un deterioro progresivo que inicia con fallas cognitivas leves, particularmente en la memoria específica y rutinaria, seguido por una pérdida gradual de recuerdos personales, identidad y orientación. A medida que la dependencia se intensifica, emergen alteraciones físicas como el oscurecimiento y engrosamiento de las venas con tonalidades verdosas, palidez extrema y deterioro muscular. En fases avanzadas, se presenta desfiguración facial progresiva, reducción de la capacidad del habla y un estado de desconexión cognitiva casi total, donde el individuo pierde toda referencia de sí mismo y su entorno.</p>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- 1.6 Asteria y la Entidad -->
+      <div class="section__header">
+        <span class="section__label">// Archivo 1.6 — MÁXIMA RESTRICCIÓN</span>
+        <h2 class="section__title">Asteria Velk — <span>El Origen de la Entidad</span></h2>
+        <p class="section__desc">Investigación clasificada. Reconstrucción basada en fragmentos del Proyecto OMICRON y testimonios de la Dra. Mael Voss. Selene Olrac, Ciclo 883.</p>
+      </div>
+
+      <div class="asteria-block">
+        <p class="asteria-block__label">ADVERTENCIA — CONTENIDO EXTREMADAMENTE SENSIBLE</p>
+        <h3 class="asteria-block__title">Quién era Asteria Velk</h3>
+        <div class="asteria-block__body">
+          <p>Asteria Velk fue una figura fundacional en la consolidación del territorio de Aster, cuya historia ha sido reinterpretada por el aparato imperial con fines ideológicos. Los registros oficiales la describen como una soberana casi mítica, responsable de establecer el orden en una región previamente considerada caótica. Sin embargo, fuentes alternativas la sitúan como una aventurera de origen desconocido que llegó con el objetivo de asentarse en zonas no exploradas, organizando posteriormente una fuerza militar para desplazar y exterminar a las poblaciones originarias. Durante aproximadamente treinta años ejerció control sobre el territorio hasta su muerte, atribuida al ataque de un habitante nativo, tras lo cual su cuerpo habría sido preservado en secreto durante siglos. De acuerdo con archivos filtrados, el emperador de la octava generación inició el Proyecto Omicrón con el propósito de restaurarla, utilizándola como símbolo y herramienta para reforzar las políticas de contención migratoria frente a poblaciones externas provenientes de regiones en conflicto como Dravengross y Quantara.</p>
+        </div>
+      </div>
+
+      <div class="node" style="margin-top:var(--space-md)">
+        <div class="node__header">
+          <span class="node__id">PROYECTO-OMICRON</span>
+          <span class="node__status" style="color:#ff4444;border-color:#ff444480">PROHIBIDO</span>
+        </div>
+        <h3 class="node__title">Informe Interno — Proyecto OMICRON (Revisión Consolidada)</h3>
+        <div class="node__content">
+          <p>El Proyecto OMICRON fue autorizado por el Soberano de la octava generación como parte de una iniciativa estratégica para restaurar la figura de Asteria Velk, no como individuo histórico, sino como instrumento funcional del Imperio. La dirección científica recayó inicialmente en la Dra. Mael Voss; sin embargo, el desarrollo sostenido durante más de tres décadas estuvo a cargo del Dr. Tomas Ereth (Laboratorio 7 — División Tanatológica), responsable de los avances en integración mineral-tejido. El objetivo operativo consistía en implantar una reconstrucción artificial de la conciencia de Velk en un huésped compatible, utilizando una combinación de Veridium en dosis extremas —derivado del trabajo de Varrow— para eliminar la identidad previa, registros mnémicos sintéticos basados en reconstrucciones históricas incompletas, y la fusión directa del mineral con el sistema nervioso del sujeto.</p>
+          <p>Los resultados fueron inestables desde fases tempranas. Ereth documentó en múltiples ocasiones los riesgos asociados al proceso, advirtiendo sobre la generación de una entidad con capacidades físicas amplificadas, deterioro morfológico severo y una psique no verificable. Sus objeciones fueron desestimadas. El proyecto culminó en la creación de una entidad funcional que no corresponde a Asteria Velk en términos históricos ni biológicos, sino a un constructo híbrido con memoria inducida, fisiología alterada de forma irreversible y una directiva implantada: la recuperación y escalamiento de las formulaciones de Varrow. Semanas después de la activación, el Dr. Ereth falleció en una explosión catalogada como accidental bajo circunstancias no esclarecidas, tras reiterar sus advertencias sobre el potencial destructivo del resultado. La Dra. Voss desapareció poco después. Su última anotación registrada indica: “Lo que creamos no tiene nombre. Y sabe perfectamente quién es.”</p>
+        </div>
+      </div>
+
+      <!-- SPECTRAL FORM -->
+      <hr class="section-divider">
+      <div class="spectral-form reveal" id="spectralForm">
+        <h3 class="spectral-form__title">Canal interno — Registro no autorizado</h3>
+        <p class="spectral-form__desc">Si esta línea sigue activa, no fui el único en dudar. Hay capas en el sistema que no revisan con la frecuencia que creen… y algunos de nosotros hemos aprendido a dejar marcas donde no deberían existir. Si puedes leer esto, ya sabes que no todo lo que circula es oficial.</p>
+                <p class="spectral-form__desc">No respondas de inmediato. Observa primero. Si decides continuar, usa el protocolo que nunca fue registrado. No lo escribas completo. Nunca lo hagas. Alguien más está escuchando.</p>
+        <div class="spectral-form__group">
+          <input type="text" class="spectral-form__input" id="spectralInput" placeholder="Introduce código de acceso..." autocomplete="off">
+          <button class="spectral-form__submit" id="spectralSubmit">Transmitir</button>
+        </div>
+        <div id="spectralResponse" style="margin-top: var(--space-md); font-family: var(--font-code); font-size: 0.8rem;"></div>
+      </div>
+
+    </div><!-- /vault-content -->
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo">ASTER</div>
+    <p class="footer__text">Archivos // Acceso No Autorizado Detectado</p>
+    <ul class="footer__links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="terminal.html">Terminal</a></li>
+      <li><a href="laboratorio.html">Laboratorio</a></li>
+      <li><a href="archivos.html">Archivos</a></li>
+    </ul>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FULLSCREEN PANELS — ARCHIVOS CORRUPTOS
+  ══════════════════════════════════════════════════════════ -->
+
+  <!-- PANEL 001 -->
+  <div class="corrupt-overlay" id="panel-001" onclick="handleOverlayClick(event,'panel-001')">
+    <div class="corrupt-panel">
+      <div class="corrupt-panel__bar">
+        <div class="corrupt-panel__bar-left">
+          <div class="corrupt-panel__dots">
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+          </div>
+          <span class="corrupt-panel__title">ARCHIVO_CORRUPTO_001.enc // ACCESO RESTRINGIDO</span>
+        </div>
+        <button class="corrupt-panel__close" onclick="closePanel('panel-001')">✕ CERRAR</button>
+      </div>
+      <div class="corrupt-panel__body">
+        <div class="corrupt-panel__meta">
+          <span class="corrupt-panel__meta-id">NODO-CRP-001</span>
+          <span class="corrupt-panel__meta-badge">CIFRADO</span>
+        </div>
+        <div class="corrupt-panel__terminal">
+          <div class="corrupt-panel__terminal-bar">
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <span class="corrupt-panel__terminal-name">PROTOCOLO_SOMBRA_SECTOR7G.enc</span>
+          </div>
+          <div class="corrupt-panel__content scrambled" id="content-001">
+            <span class="corrupt-panel__line" data-text="Protocolo SOMBRA activado en Sector 7-G"></span>
+            <span class="corrupt-panel__line" data-text="Los sujetos de prueba han sido trasladados a la instalación subterránea"></span>
+            <span class="corrupt-panel__line" data-text="Resultados preliminares: la fusión mineral-tejido es posible pero irreversible"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--warn" data-text="El Soberano ha ordenado acelerar la Fase 3"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--error" data-text='Nota del Dr. Varrow: "Esto no es ciencia. Es una abominación."'></span>
+          </div>
+        </div>
+        <div class="corrupt-decrypt-bar" id="bar-001"><div class="corrupt-decrypt-bar__fill" id="barfill-001"></div></div>
+        <div class="corrupt-pw" id="pw-001">
+          <span class="corrupt-pw__label">> SISTEMA CIFRADO — INTRODUCE CLAVE NUMÉRICA PARA DESCIFRAR</span>
+          <div class="corrupt-pw__form">
+            <input type="text" class="corrupt-pw__input" id="pwinput-001" placeholder="0 0 0 0" maxlength="4" autocomplete="off" inputmode="numeric">
+            <button class="corrupt-pw__btn" onclick="tryDecrypt('001')">▶ DESCIFRAR</button>
+          </div>
+          <p class="corrupt-pw__error" id="pwerror-001"></p>
+          <p class="corrupt-pw__hint">> Pista: contraseña numérica de 4 dígitos</p>
+        </div>
+        <div class="corrupt-pw__success" id="pwsuccess-001">> DESCIFRADO COMPLETO — ARCHIVO 001 DESBLOQUEADO</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 002 -->
+  <div class="corrupt-overlay" id="panel-002" onclick="handleOverlayClick(event,'panel-002')">
+    <div class="corrupt-panel">
+      <div class="corrupt-panel__bar">
+        <div class="corrupt-panel__bar-left">
+          <div class="corrupt-panel__dots">
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+          </div>
+          <span class="corrupt-panel__title">ARCHIVO_CORRUPTO_002.enc // ACCESO RESTRINGIDO</span>
+        </div>
+        <button class="corrupt-panel__close" onclick="closePanel('panel-002')">✕ CERRAR</button>
+      </div>
+      <div class="corrupt-panel__body">
+        <div class="corrupt-panel__meta">
+          <span class="corrupt-panel__meta-id">NODO-CRP-002</span>
+          <span class="corrupt-panel__meta-badge">CIFRADO</span>
+        </div>
+        <div class="corrupt-panel__terminal">
+          <div class="corrupt-panel__terminal-bar">
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <span class="corrupt-panel__terminal-name">VIGILANCIA_IMPERIAL.enc</span>
+          </div>
+          <div class="corrupt-panel__content scrambled" id="content-002">
+            <span class="corrupt-panel__line" data-text='Informe de vigilancia: "Espectro" '></span>
+            <span class="corrupt-panel__line" data-text="Número estimado de miembros: [DATOS BORRADOS]"></span>
+            <span class="corrupt-panel__line" data-text="Operaciones confirmadas: sabotaje en Mina 12, robo de máscaras del Lab-3"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--warn" data-text="Líder identificado como: [ERROR DE ACCESO — ARCHIVO BLOQUEADO]"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--error" data-text="Recomendación: Eliminación inmediata de todos los sospechosos"></span>
+          </div>
+        </div>
+        <div class="corrupt-decrypt-bar" id="bar-002"><div class="corrupt-decrypt-bar__fill" id="barfill-002"></div></div>
+        <div class="corrupt-pw" id="pw-002">
+          <span class="corrupt-pw__label">> SISTEMA CIFRADO — INTRODUCE CLAVE NUMÉRICA PARA DESCIFRAR</span>
+          <div class="corrupt-pw__form">
+            <input type="text" class="corrupt-pw__input" id="pwinput-002" placeholder="0 0 0 0" maxlength="4" autocomplete="off" inputmode="numeric">
+            <button class="corrupt-pw__btn" onclick="tryDecrypt('002')">▶ DESCIFRAR</button>
+          </div>
+          <p class="corrupt-pw__error" id="pwerror-002"></p>
+          <p class="corrupt-pw__hint">> Pista: contraseña numérica de 4 dígitos</p>
+        </div>
+        <div class="corrupt-pw__success" id="pwsuccess-002">> DESCIFRADO COMPLETO — ARCHIVO 002 DESBLOQUEADO</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 003 -->
+  <div class="corrupt-overlay" id="panel-003" onclick="handleOverlayClick(event,'panel-003')">
+    <div class="corrupt-panel">
+      <div class="corrupt-panel__bar">
+        <div class="corrupt-panel__bar-left">
+          <div class="corrupt-panel__dots">
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+            <div class="corrupt-panel__dot"></div>
+          </div>
+          <span class="corrupt-panel__title">ARCHIVO_CORRUPTO_003.enc // ACCESO RESTRINGIDO</span>
+        </div>
+        <button class="corrupt-panel__close" onclick="closePanel('panel-003')">✕ CERRAR</button>
+      </div>
+      <div class="corrupt-panel__body">
+        <div class="corrupt-panel__meta">
+          <span class="corrupt-panel__meta-id">NODO-CRP-003</span>
+          <span class="corrupt-panel__meta-badge">CIFRADO</span>
+        </div>
+        <div class="corrupt-panel__terminal">
+          <div class="corrupt-panel__terminal-bar">
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <div class="corrupt-panel__terminal-dot"></div>
+            <span class="corrupt-panel__terminal-name">REGISTRO_MEDICO_EXPOSICION_VERDE.enc</span>
+          </div>
+          <div class="corrupt-panel__content scrambled" id="content-003">
+            <span class="corrupt-panel__line" data-text="Registro médico — Paciente: [NOMBRE CENSURADO]"></span>
+            <span class="corrupt-panel__line" data-text="Diagnóstico: Síndrome de Exposición Verde, Etapa 4"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--warn" data-text="Síntomas: Escléras completamente verdes, venas luminosas, pérdida de identidad"></span>
+            <span class="corrupt-panel__line corrupt-panel__line--warn" data-text='El paciente afirma "escuchar al Domo". ¿Delira o dice la verdad?'></span>
+            <span class="corrupt-panel__line corrupt-panel__line--error" data-text="Orden del Prefecto: Transferir a Instalación de Contención. Sin registro."></span>
+          </div>
+        </div>
+        <div class="corrupt-decrypt-bar" id="bar-003"><div class="corrupt-decrypt-bar__fill" id="barfill-003"></div></div>
+        <div class="corrupt-pw" id="pw-003">
+          <span class="corrupt-pw__label">> SISTEMA CIFRADO — INTRODUCE CLAVE NUMÉRICA PARA DESCIFRAR</span>
+          <div class="corrupt-pw__form">
+            <input type="text" class="corrupt-pw__input" id="pwinput-003" placeholder="0 0 0 0" maxlength="4" autocomplete="off" inputmode="numeric">
+            <button class="corrupt-pw__btn" onclick="tryDecrypt('003')">▶ DESCIFRAR</button>
+          </div>
+          <p class="corrupt-pw__error" id="pwerror-003"></p>
+          <p class="corrupt-pw__hint">> Pista: contraseña numérica de 4 dígitos</p>
+        </div>
+        <div class="corrupt-pw__success" id="pwsuccess-003">> DESCIFRADO COMPLETO — ARCHIVO 003 DESBLOQUEADO</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    /* ══════════════════════════════════════════════
+       VAULT LOGIC (Clase-V)
+    ══════════════════════════════════════════════ */
+    var SECRET = 'Asteria Velk';
+
+    function normalizeInput(s) {
+      return s.trim().toLowerCase().replace(/\s+/g,' ');
+    }
+
+    document.getElementById('vaultBtn').addEventListener('click', tryUnlock);
+    document.getElementById('vaultInput').addEventListener('keypress', function(e){
+      if (e.key === 'Enter') tryUnlock();
+    });
+
+    function tryUnlock() {
+      var input = document.getElementById('vaultInput').value;
+      var errorEl = document.getElementById('vaultError');
+
+      if (normalizeInput(input) === normalizeInput(SECRET)) {
+        var gate = document.getElementById('vaultGate');
+        var scan = document.createElement('div');
+        scan.className = 'vault-scan';
+        gate.appendChild(scan);
+
+        setTimeout(function(){
+          gate.style.transition = 'opacity .5s, transform .5s';
+          gate.style.opacity = '0';
+          gate.style.transform = 'translateY(-10px)';
+        }, 600);
+        setTimeout(function(){
+          gate.style.display = 'none';
+          var content = document.getElementById('vaultContent');
+          content.classList.add('unlocked');
+          var reveals = content.querySelectorAll('.reveal');
+          for (var i=0;i<reveals.length;i++){
+            reveals[i].classList.add('visible');
+          }
+          buildWaveforms();
+        }, 1100);
+
+        errorEl.textContent = '';
+      } else {
+        errorEl.textContent = '> ERROR: Código incorrecto. Intento registrado.';
+        var form = document.querySelector('.vault-gate__form');
+        form.classList.add('shake');
+        setTimeout(function(){ form.classList.remove('shake'); }, 400);
+        document.getElementById('vaultInput').value = '';
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       AUDIO TOGGLE
+    ══════════════════════════════════════════════ */
+    function toggleAudio(el) {
+  var transcript = el.querySelector('.audio-record__transcript');
+  var player = el.querySelector('.audio-record__player');
+  var playBtn = el.querySelector('.audio-record__play');
+  var isOpen = transcript.classList.contains('show');
+
+  // Pausar todos los otros audios primero
+  document.querySelectorAll('.audio-record__player').forEach(function(p) {
+    if (p !== player) {
+      p.pause();
+      p.currentTime = 0;
+    }
+  });
+  document.querySelectorAll('.audio-record__play').forEach(function(btn) {
+    if (btn !== playBtn) btn.textContent = '▶';
+  });
+  document.querySelectorAll('.audio-record__transcript').forEach(function(t) {
+    if (t !== transcript) t.classList.remove('show');
+  });
+
+  // Toggle el actual
+  transcript.classList.toggle('show');
+
+  if (!isOpen) {
+    // Abrir transcript y reproducir
+    player.play();
+    playBtn.textContent = '⏸';
+    player.onended = function() {
+      playBtn.textContent = '▶';
+    };
+  } else {
+    // Cerrar transcript y pausar
+    player.pause();
+    player.currentTime = 0;
+    playBtn.textContent = '▶';
+  }
+}
+
+    /* ══════════════════════════════════════════════
+       WAVEFORM BUILDER
+    ══════════════════════════════════════════════ */
+    function buildWaveforms() {
+      ['wv1','wv2'].forEach(function(id){
+        var container = document.getElementById(id);
+        if (!container) return;
+        var heights = [8,12,18,24,14,20,30,22,16,26,30,20,14,18,12,8,14,20,28,24,18,12,10,16,22,18,26,30,24,16];
+        heights.forEach(function(h){
+          var s = document.createElement('span');
+          s.style.height = h+'px';
+          container.appendChild(s);
+        });
+      });
+    }
+
+    /* ══════════════════════════════════════════════
+       SCRAMBLE TEXT ENGINE
+    ══════════════════════════════════════════════ */
+    var SCRAMBLE_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz▓▒░█▐▌■□▪▫◆◇△▽◯⬡⬢';
+    var scrambleIntervals = {};
+
+    // Encrypted content shown on the cards (preview scramble)
+    var CARD_TEXTS = [
+      'PROTOCOLO SOMBRA SECTOR 7-G... SUJETOS TRASLADADOS... FUSION MINERAL-TEJIDO... FASE 3 ACELERADA...',
+      'VIGILANCIA CELULA ESPECTRO... OPERACIONES CONFIRMADAS MINA-12... LIDER IDENTIFICADO... ELIMINACION RECOMENDADA...',
+      'REGISTRO MEDICO EXPOSICION VERDE... ETAPA-4... ESCLERAS VERDES... SUSURRO DEL DOMO... CONTENCIÓN SIN REGISTRO...'
+    ];
+
+    function scrambleText(text, progress) {
+      // progress 0..1: 0 = fully scrambled, 1 = fully readable
+      var result = '';
+      for (var i = 0; i < text.length; i++) {
+        if (text[i] === ' ') { result += ' '; continue; }
+        if (Math.random() < progress) {
+          result += text[i];
+        } else {
+          result += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }
+      }
+      return result;
+    }
+
+    function startCardScramble(cardId, textIndex) {
+      var el = document.getElementById('scramble-' + cardId);
+      if (!el) return;
+      var text = CARD_TEXTS[textIndex];
+      if (scrambleIntervals['card-' + cardId]) clearInterval(scrambleIntervals['card-' + cardId]);
+      scrambleIntervals['card-' + cardId] = setInterval(function(){
+        el.textContent = scrambleText(text, 0.08);
+      }, 80);
+    }
+
+    // Init card scrambles
+    startCardScramble('001', 0);
+    startCardScramble('002', 1);
+    startCardScramble('003', 2);
+
+    /* ══════════════════════════════════════════════
+       PANEL OPEN / CLOSE
+    ══════════════════════════════════════════════ */
+    var decryptedPanels = {};
+
+    function openPanel(panelId) {
+      var overlay = document.getElementById(panelId);
+      if (!overlay) return;
+      document.body.style.overflow = 'hidden';
+      overlay.classList.add('active');
+      // Start scramble on lines inside panel if not yet decrypted
+      if (!decryptedPanels[panelId]) {
+        startPanelScramble(panelId);
+      }
+      // Focus password input
+      var num = panelId.split('-')[1];
+      var inp = document.getElementById('pwinput-' + num);
+      if (inp && !decryptedPanels[panelId]) {
+        setTimeout(function(){ inp.focus(); }, 300);
+      }
+    }
+
+    function openCorruptPanel(panelId) {
+      openPanel(panelId);
+    }
+
+    function closePanel(panelId) {
+      var overlay = document.getElementById(panelId);
+      if (!overlay) return;
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function handleOverlayClick(e, panelId) {
+      // Close only if clicking the dark overlay backdrop, not the panel itself
+      if (e.target === document.getElementById(panelId)) {
+        closePanel(panelId);
+      }
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') {
+        var panels = document.querySelectorAll('.corrupt-overlay.active');
+        for (var i = 0; i < panels.length; i++) {
+          panels[i].classList.remove('active');
+        }
+        document.body.style.overflow = '';
+      }
+    });
+
+    /* ══════════════════════════════════════════════
+       PANEL LINE SCRAMBLE
+    ══════════════════════════════════════════════ */
+    function startPanelScramble(panelId) {
+      var num = panelId.split('-')[1];
+      var contentEl = document.getElementById('content-' + num);
+      if (!contentEl) return;
+      var lines = contentEl.querySelectorAll('.corrupt-panel__line');
+
+      if (scrambleIntervals['panel-' + num]) clearInterval(scrambleIntervals['panel-' + num]);
+
+      scrambleIntervals['panel-' + num] = setInterval(function(){
+        for (var i = 0; i < lines.length; i++) {
+          var original = lines[i].getAttribute('data-text') || '';
+          lines[i].textContent = scrambleText(original, 0.05);
+        }
+      }, 60);
+    }
+
+    function stopPanelScramble(panelId) {
+      var num = panelId.split('-')[1];
+      if (scrambleIntervals['panel-' + num]) {
+        clearInterval(scrambleIntervals['panel-' + num]);
+        delete scrambleIntervals['panel-' + num];
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       DECRYPT PASSWORD CHECK
+    ══════════════════════════════════════════════ */
+    var FILE_PASSWORD = '0047';
+
+    // Allow Enter key on password inputs
+    ['001','002','003'].forEach(function(num){
+      var inp = document.getElementById('pwinput-' + num);
+      if (inp) {
+        inp.addEventListener('keypress', function(e){
+          if (e.key === 'Enter') tryDecrypt(num);
+        });
+        // Only allow digits
+        inp.addEventListener('input', function(){
+          this.value = this.value.replace(/[^0-9]/g, '');
+        });
+      }
+    });
+
+    function tryDecrypt(num) {
+      var panelId = 'panel-' + num;
+      var input = document.getElementById('pwinput-' + num);
+      var errorEl = document.getElementById('pwerror-' + num);
+      var contentEl = document.getElementById('content-' + num);
+      var pwEl = document.getElementById('pw-' + num);
+      var successEl = document.getElementById('pwsuccess-' + num);
+      var barEl = document.getElementById('bar-' + num);
+      var barFillEl = document.getElementById('barfill-' + num);
+
+      if (!input) return;
+      var val = input.value.trim();
+
+      if (val === FILE_PASSWORD) {
+        errorEl.textContent = '';
+        // Show decrypt progress bar
+        barEl.classList.add('active');
+        setTimeout(function(){ barFillEl.style.width = '100%'; }, 50);
+
+        // Run decryption animation
+        runDecryptAnimation(panelId, num, function(){
+          // After animation done
+          stopPanelScramble(panelId);
+          // Show real text
+          var lines = contentEl.querySelectorAll('.corrupt-panel__line');
+          for (var i = 0; i < lines.length; i++) {
+            lines[i].textContent = lines[i].getAttribute('data-text') || '';
+          }
+          contentEl.classList.remove('scrambled');
+          contentEl.classList.add('decrypted');
+          // Hide password gate, show success
+          pwEl.classList.add('hidden');
+          successEl.classList.add('show');
+          decryptedPanels[panelId] = true;
+        });
+      } else {
+        errorEl.textContent = '> ERROR: Clave incorrecta. Intento registrado en el sistema.';
+        var form = document.getElementById('pw-' + num).querySelector('.corrupt-pw__form');
+        if (form) {
+          form.style.animation = 'none';
+          form.offsetHeight; // reflow
+          form.style.animation = 'shake .4s ease';
+          setTimeout(function(){ form.style.animation = ''; }, 400);
+        }
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    function runDecryptAnimation(panelId, num, callback) {
+      var contentEl = document.getElementById('content-' + num);
+      var lines = contentEl.querySelectorAll('.corrupt-panel__line');
+      var duration = 900; // ms total
+      var start = Date.now();
+
+      // Progressive reveal: scramble from 0 -> 1 over duration
+      if (scrambleIntervals['panel-' + num]) clearInterval(scrambleIntervals['panel-' + num]);
+
+      scrambleIntervals['panel-decrypt-' + num] = setInterval(function(){
+        var elapsed = Date.now() - start;
+        var progress = Math.min(elapsed / duration, 1);
+
+        for (var i = 0; i < lines.length; i++) {
+          var original = lines[i].getAttribute('data-text') || '';
+          if (progress >= 1) {
+            lines[i].textContent = original;
+          } else {
+            // Each line decrypts slightly offset
+            var lineProgress = Math.max(0, progress * 1.4 - (i * 0.12));
+            lines[i].textContent = scrambleText(original, lineProgress);
+          }
+        }
+
+        if (progress >= 1) {
+          clearInterval(scrambleIntervals['panel-decrypt-' + num]);
+          callback();
+        }
+      }, 30);
+    }
+  </script>
+</body>
+</html>

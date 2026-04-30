@@ -1,0 +1,1229 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Laboratorio ASTER - Sistema de búsqueda imperial clasificado.">
+  <title>ASTER | Laboratorio</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ══════════════════════════════════════════
+       SEARCH TERMINAL — PANTALLA INICIAL
+    ══════════════════════════════════════════ */
+    .lab-shell {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    /* Bloque de búsqueda principal */
+    .search-block {
+      background: rgba(0,5,0,.94);
+      border: 1px solid rgba(57,255,20,.25);
+      border-top: 3px solid var(--green-neon);
+      overflow: hidden;
+      position: relative;
+    }
+    .search-block::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+      animation: sbScan 6s linear infinite;
+      pointer-events: none;
+      opacity: .5;
+    }
+    @keyframes sbScan {
+      0%   { top: 0; opacity: .7; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .search-block__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+    }
+    .search-block__bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .search-block__dots { display: flex; gap: 5px; }
+    .search-block__dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .search-block__dot:nth-child(1) { background: #ff4444; box-shadow: 0 0 4px #ff4444; }
+    .search-block__dot:nth-child(2) { background: var(--brass); box-shadow: 0 0 4px var(--brass); }
+    .search-block__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .search-block__title {
+      font-family: var(--font-code);
+      font-size: .67rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .search-block__badge {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-neon);
+      border: 1px solid var(--green-dim);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+      animation: badgePulse 2.5s ease-in-out infinite;
+    }
+    @keyframes badgePulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    .search-block__body {
+      padding: var(--space-xl);
+    }
+    .search-block__prompt-line {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .search-block__prompt-line::before {
+      content: '>';
+      color: var(--green-neon);
+      font-size: .9rem;
+    }
+    .search-block__form {
+      display: flex;
+      gap: var(--space-sm);
+      max-width: 640px;
+      margin-bottom: var(--space-md);
+    }
+    .search-block__input {
+      flex: 1;
+      background: rgba(0,10,0,.85);
+      border: 1px solid var(--green-dim);
+      padding: var(--space-md) var(--space-lg);
+      color: var(--green-neon);
+      font-family: var(--font-code);
+      font-size: .9rem;
+      outline: none;
+      letter-spacing: 2px;
+      caret-color: var(--green-neon);
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .search-block__input:focus {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 20px var(--green-dim);
+    }
+    .search-block__input::placeholder { color: var(--green-dim); letter-spacing: 1px; }
+    .search-block__btn {
+      background: transparent;
+      border: 1px solid var(--green-neon);
+      color: var(--green-neon);
+      padding: var(--space-md) var(--space-xl);
+      font-family: var(--font-code);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .3s;
+    }
+    .search-block__btn:hover {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+      box-shadow: var(--shadow-neon);
+    }
+    .search-block__error {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: #ff4444;
+      min-height: 1.2em;
+      letter-spacing: 1px;
+      margin-top: var(--space-sm);
+    }
+    .search-block__footer {
+      border-top: 1px dashed rgba(57,255,20,.12);
+      padding: var(--space-md) var(--space-xl);
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--iron-gray);
+      letter-spacing: 1px;
+      background: rgba(57,255,20,.02);
+    }
+    .search-block__footer::before { content: '// '; color: var(--brass); }
+
+    /* Historial de búsquedas */
+    .search-history {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--green-dim);
+      line-height: 2;
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px solid rgba(57,255,20,.08);
+    }
+    .search-history__label {
+      color: var(--brass);
+      font-size: .6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+    .search-history__tag {
+      display: inline-block;
+      border: 1px solid rgba(57,255,20,.2);
+      padding: 2px 10px;
+      margin: 3px 4px 3px 0;
+      cursor: pointer;
+      transition: all .2s;
+      font-size: .65rem;
+      letter-spacing: 1px;
+      color: var(--iron-light);
+    }
+    .search-history__tag:hover {
+      border-color: var(--green-neon);
+      color: var(--green-neon);
+      box-shadow: 0 0 8px var(--green-dim);
+    }
+
+    /* Indicador de procesamiento */
+    .search-processing {
+      display: none;
+      font-family: var(--font-code);
+      font-size: .78rem;
+      color: var(--green-neon);
+      letter-spacing: 2px;
+      padding: var(--space-md) var(--space-xl);
+      border-top: 1px solid rgba(57,255,20,.1);
+    }
+    .search-processing.show { display: block; }
+    .search-processing__dots::after {
+      content: '';
+      animation: processDots 1.2s steps(4) infinite;
+    }
+    @keyframes processDots {
+      0%  { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+
+    /* ══════════════════════════════════════════
+       RESULT PANEL — PANTALLA DE RESULTADO
+    ══════════════════════════════════════════ */
+    .result-panel {
+      display: none;
+      animation: resultReveal .4s ease;
+    }
+    .result-panel.show { display: block; }
+    @keyframes resultReveal {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cabecera del resultado */
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+    }
+    .result-back-btn {
+      background: transparent;
+      border: 1px solid rgba(57,255,20,.4);
+      color: var(--green-dim);
+      font-family: var(--font-code);
+      font-size: .7rem;
+      padding: 6px 14px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all .25s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .result-back-btn:hover {
+      border-color: var(--green-neon);
+      color: var(--green-neon);
+    }
+    .result-back-btn::before { content: '← '; }
+    .result-query-display {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .result-query-display span { color: var(--green-neon); }
+
+    /* ══ DEFINICIÓN BREVE ══ */
+    .def-card {
+      background: rgba(0,5,0,.92);
+      border: 1px solid rgba(57,255,20,.25);
+      border-left: 4px solid var(--green-neon);
+      overflow: hidden;
+      position: relative;
+    }
+    .def-card__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.12);
+    }
+    .def-card__id {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .def-card__type {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-neon);
+      border: 1px solid var(--green-dim);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+    .def-card__body {
+      padding: var(--space-xl);
+    }
+    .def-card__title {
+      font-family: var(--font-imperial);
+      font-size: 1.6rem;
+      color: var(--cream);
+      margin-bottom: var(--space-sm);
+    }
+    .def-card__desc {
+      font-family: var(--font-code);
+      font-size: .84rem;
+      color: var(--iron-light);
+      line-height: 2;
+      padding-left: var(--space-md);
+      border-left: 2px solid rgba(57,255,20,.2);
+      margin-bottom: var(--space-lg);
+    }
+    .def-card__desc strong { color: var(--bronze-light); }
+    .def-card__desc .highlight { color: var(--green-neon); font-weight: 700; }
+    .def-card__redirect {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--green-neon);
+      border: 1px solid rgba(57,255,20,.4);
+      padding: var(--space-sm) var(--space-lg);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all .3s;
+      cursor: pointer;
+    }
+    .def-card__redirect:hover {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+      box-shadow: var(--shadow-neon);
+    }
+    .def-card__redirect::before { content: '→'; }
+    .def-card__footer {
+      padding: var(--space-sm) var(--space-xl);
+      border-top: 1px dashed rgba(57,255,20,.1);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--iron-gray);
+      letter-spacing: 1px;
+      background: rgba(57,255,20,.02);
+    }
+    .def-card__footer::before { content: '> '; color: var(--green-dim); }
+
+    /* Clasificación adicional */
+    .def-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px dashed rgba(57,255,20,.12);
+    }
+    .def-meta-item {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--iron-gray);
+      letter-spacing: 1px;
+    }
+    .def-meta-item strong {
+      color: var(--brass);
+      margin-right: 4px;
+    }
+
+    /* ══ INFORME RESTRINGIDO ══ */
+    .report-card {
+      background: rgba(0,5,0,.92);
+      border: 1px solid rgba(201,109,31,.3);
+      border-top: 3px solid var(--copper);
+      overflow: hidden;
+      position: relative;
+    }
+    .report-card__scan {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--copper), transparent);
+      animation: repScan 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes repScan {
+      0%   { top: 0; opacity: .7; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .report-card__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(201,109,31,.06);
+      border-bottom: 1px solid rgba(201,109,31,.2);
+    }
+    .report-card__id {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--copper);
+      letter-spacing: 2px;
+    }
+    .report-card__alert {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,.4);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+      animation: alertBlink 2s infinite;
+    }
+    @keyframes alertBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .report-card__body {
+      padding: var(--space-xl);
+    }
+    .report-card__label {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--copper);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .report-card__label::before { content: '⚠'; font-size: .85rem; }
+    .report-card__title {
+      font-family: var(--font-imperial);
+      font-size: 1.5rem;
+      color: var(--cream);
+      margin-bottom: var(--space-md);
+    }
+    .report-card__text {
+      font-family: var(--font-code);
+      font-size: .83rem;
+      color: var(--iron-light);
+      line-height: 2;
+      margin-bottom: var(--space-md);
+      padding-left: var(--space-md);
+      border-left: 2px solid rgba(201,109,31,.25);
+    }
+    .report-card__text strong { color: var(--bronze-light); }
+
+    /* Sección restringida dentro del informe */
+    .report-restricted {
+      margin-top: var(--space-lg);
+      background: rgba(0,5,0,.85);
+      border: 1px solid rgba(255,68,68,.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .report-restricted__scanline {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,68,68,.6), transparent);
+      animation: resScan 3.5s linear infinite;
+    }
+    @keyframes resScan { 0%{top:0;opacity:.8} 100%{top:100%;opacity:0} }
+    .report-restricted__bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      background: rgba(255,68,68,.05);
+      border-bottom: 1px solid rgba(255,68,68,.12);
+    }
+    .report-restricted__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #ff4444;
+      animation: dotBlink 1.8s ease-in-out infinite;
+    }
+    @keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .report-restricted__bar-title {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: rgba(255,68,68,.7);
+      letter-spacing: 2px;
+    }
+    .report-restricted__body {
+      padding: var(--space-lg) var(--space-xl);
+      text-align: center;
+    }
+    .report-restricted__icon {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+    .report-restricted__msg {
+      font-family: var(--font-imperial);
+      font-size: 1.1rem;
+      color: rgba(255,100,100,.85);
+      margin-bottom: var(--space-sm);
+    }
+    .report-restricted__sub {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: rgba(255,68,68,.5);
+      letter-spacing: 1px;
+      line-height: 1.8;
+    }
+    .report-restricted__code {
+      display: inline-block;
+      margin-top: var(--space-sm);
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: rgba(255,68,68,.35);
+      letter-spacing: 2px;
+    }
+    .report-card__footer {
+      padding: var(--space-sm) var(--space-xl);
+      border-top: 1px dashed rgba(201,109,31,.15);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--iron-gray);
+      letter-spacing: 1px;
+      background: rgba(201,109,31,.02);
+    }
+    .report-card__footer::before { content: '> '; color: var(--copper); }
+
+    /* ══ SIN RESULTADOS ══ */
+    .noresult-card {
+      background: rgba(0,5,0,.92);
+      border: 1px solid rgba(57,255,20,.12);
+      padding: var(--space-2xl) var(--space-xl);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .noresult-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(57,255,20,.01) 3px, rgba(57,255,20,.01) 6px
+      );
+      pointer-events: none;
+    }
+    .noresult-card__icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: var(--space-md);
+      opacity: .4;
+      filter: grayscale(1);
+    }
+    .noresult-card__line {
+      font-family: var(--font-code);
+      font-size: .85rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-sm);
+    }
+    .noresult-card__line::before { content: '> '; color: rgba(57,255,20,.3); }
+    .noresult-card__code {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: rgba(57,255,20,.2);
+      letter-spacing: 3px;
+      margin-top: var(--space-lg);
+    }
+
+    /* ══ LISTA DE TÉRMINOS SUGERIDOS (pantalla inicial) ══ */
+    .term-cloud {
+      background: rgba(0,5,0,.85);
+      border: 1px solid rgba(57,255,20,.15);
+      padding: var(--space-lg) var(--space-xl);
+      margin-top: var(--space-lg);
+    }
+    .term-cloud__label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--brass);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-md);
+      display: block;
+    }
+    .term-cloud__label::before { content: '// '; }
+    .term-cloud__grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .term-cloud__chip {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--iron-light);
+      letter-spacing: 1px;
+      border: 1px solid rgba(57,255,20,.18);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    .term-cloud__chip::before { content: '> '; color: var(--green-dim); }
+    .term-cloud__chip:hover {
+      border-color: var(--green-neon);
+      color: var(--green-neon);
+      background: rgba(57,255,20,.05);
+    }
+    .term-cloud__chip--restricted {
+      border-color: rgba(255,68,68,.25);
+      color: rgba(255,100,100,.7);
+    }
+    .term-cloud__chip--restricted::before { color: rgba(255,68,68,.4); }
+    .term-cloud__chip--restricted:hover {
+      border-color: rgba(255,68,68,.5);
+      color: #ff6666;
+      background: rgba(255,68,68,.04);
+    }
+
+    /* ══ SHAKE ══ */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .shake { animation: shake .4s ease; }
+
+    /* ══ BLINKING CURSOR on initial prompt ══ */
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 1.1em;
+      background: var(--green-neon);
+      vertical-align: text-bottom;
+      animation: cursorBlink .8s steps(1) infinite;
+      margin-left: 2px;
+    }
+    @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+  </style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <span class="loader__text">CARGANDO LABORATORIO...</span>
+    <div class="loader__bar"><div class="loader__progress"></div></div>
+  </div>
+
+  <div class="particles" id="particles"></div>
+
+  <div class="gear-container">
+    <div class="gear">
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+    </div>
+    <div class="gear gear--small">
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+    </div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav__logo">ASTER</a>
+    <div class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="index.html" class="nav__link">Inicio</a></li>
+      <li><a href="terminal.html" class="nav__link">Terminal</a></li>
+      <li><a href="laboratorio.html" class="nav__link active">Laboratorio</a></li>
+      <li><a href="archivos.html" class="nav__link">Archivos</a></li>
+    </ul>
+  </nav>
+
+  <header class="page-header">
+    <p class="page-header__breadcrumb"><a href="index.html">ASTER</a> / LABORATORIO</p>
+    <h1 class="page-header__title glitch" data-text="Laboratorio">Laboratorio</h1>
+    <p class="page-header__desc">Sistema de consulta clasificado. Nivel de acceso: Clandestino. Introduce un término para iniciar búsqueda.</p>
+  </header>
+
+  <main class="section">
+    <div class="lab-shell">
+
+      <!-- ══════════════════════════════════
+           PANTALLA INICIAL — BUSCADOR
+      ══════════════════════════════════ -->
+      <div id="screen-search">
+
+        <div class="search-block reveal">
+          <div class="search-block__bar">
+            <div class="search-block__bar-left">
+              <div class="search-block__dots">
+                <div class="search-block__dot"></div>
+                <div class="search-block__dot"></div>
+                <div class="search-block__dot"></div>
+              </div>
+              <span class="search-block__title">LABORATORIO_BUSQUEDA.enc // SISTEMA ACTIVO</span>
+            </div>
+            <span class="search-block__badge">EN LÍNEA</span>
+          </div>
+
+          <div class="search-block__body">
+            <p class="search-block__prompt-line">
+              INTRODUCE UN TÉRMINO DE BÚSQUEDA PARA CONSULTAR LA BASE DE DATOS IMPERIAL
+              <span class="cursor-blink"></span>
+            </p>
+
+            <div class="search-block__form">
+              <input
+                type="text"
+                class="search-block__input"
+                id="searchInput"
+                placeholder="Buscar en el Sistema"
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="60"
+              >
+              <button class="search-block__btn" id="searchBtn">▶ BUSCAR</button>
+            </div>
+
+            <p class="search-block__error" id="searchError"></p>
+
+            <div class="search-processing" id="searchProcessing">
+              <span class="search-processing__dots">Procesando consulta</span>
+            </div>
+
+            <div class="search-history" id="searchHistory" style="display:none">
+              <span class="search-history__label">// Búsquedas recientes</span>
+              <div id="historyTags"></div>
+            </div>
+          </div>
+
+          <div class="search-block__footer">
+            Advertencia: toda actividad en este sistema queda registrada por la Unidad de Integridad Informativa del Alto Consejo. Use con discreción.
+          </div>
+        </div>
+
+      </div><!-- /#screen-search -->
+
+      <!-- ══════════════════════════════════
+           PANTALLA DE RESULTADO
+      ══════════════════════════════════ -->
+      <div id="screen-result" class="result-panel">
+
+        <div class="result-header">
+          <button class="result-back-btn" onclick="goBack()">Volver al buscador</button>
+          <span class="result-query-display">Búsqueda: "<span id="resultQueryLabel"></span>"</span>
+        </div>
+
+        <div id="resultOutput"></div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo">ASTER</div>
+    <p class="footer__text">Laboratorio // Acceso Clandestino</p>
+    <ul class="footer__links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="terminal.html">Terminal</a></li>
+      <li><a href="laboratorio.html">Laboratorio</a></li>
+      <li><a href="archivos.html">Archivos</a></li>
+    </ul>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+  /* ════════════════════════════════════════════════════════
+     BASE DE DATOS DE TÉRMINOS
+  ════════════════════════════════════════════════════════ */
+
+  var DEFINITIONS = {
+    'el domo': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-001',
+      title: 'El Domo',
+      desc: `Estructura de contención energética de origen desconocido que cubre el núcleo urbano de Aster. Su existencia es presentada oficialmente como una manifestación del <strong>linaje fundador</strong>: se afirma que únicamente quienes poseen sangre del linaje puro pueden atravesarlo sin ser rechazados.
+<br><br>
+Registros no verificados apuntan a que el Domo no reconoce sangre, sino tecnología: un dispositivo de identificación implantado en el organismo de cada ciudadano desde su nacimiento. La narrativa biológica sería, en ese caso, una ficción de Estado sostenida durante generaciones.
+<br><br>
+El origen del Domo está vinculado al nombre de <span class="highlight">Asteria Velk</span>, figura fundacional del Imperio cuya historia oficial ha sido objeto de múltiples revisiones. Algunos fragmentos sugieren que su relación con el Domo excede lo histórico.`,
+      footer: 'Clasificación: Infraestructura Imperial — Nivel S. Información complementaria disponible en Archivos.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Clasificación', val: 'Infraestructura Clase-S' },
+        { key: 'Estado', val: 'Operativo — Ciclo 882' },
+        { key: 'Acceso', val: 'Restringido — Solo Linaje Certificado' }
+      ]
+    },
+
+    'veridium': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-002',
+      title: 'Veridium',
+      desc: `Mineral de composición única, localizado exclusivamente en el subsuelo de Aster. Constituye la principal fuente de energía renovable que sostiene la economía global y el poder geopolítico del Imperio. Ningún sustituto ha sido identificado.
+<br><br>
+Su extracción es llevada a cabo en los sectores mineros perimetrales por trabajadores sin clasificación de linaje. La exposición prolongada al mineral produce alteraciones fisiológicas progresivas conocidas como <strong>Síndrome de Exposición Verde</strong>: tinción de escleras, luminiscencia venosa y, en fases avanzadas, desfiguración irreversible.
+<br><br>
+Paralelamente, el Veridium es el componente base de la sustancia <strong>VX-13</strong>, desarrollada en el Laboratorio 7 del Alto Consejo.`,
+      footer: 'Clasificación: Recurso Estratégico Clase-A. Investigación adicional: consultar Archivos de Hall Varrow.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Origen', val: 'Subsuelo de Aster — Minas periféricas' },
+        { key: 'Sustitutos', val: 'Ninguno registrado' },
+        { key: 'Peligrosidad', val: 'Alta en exposición directa y prolongada' }
+      ]
+    },
+
+    'el imperio': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-003',
+      title: 'El Imperio',
+      desc: `Sistema de gobierno centralizado en Aster, fundado sobre el control del Veridium y la narrativa del linaje puro. Su estructura se organiza en torno al Soberano, el Alto Consejo, las Prefecturas de Sector y el cuerpo de seguridad conocido como <strong>F.O.R.J.A.</strong>
+<br><br>
+El Imperio sostiene su legitimidad en el relato de que un linaje elegido domesticó el caos primordial y fundó la civilización. Este relato no solo justifica la jerarquía: la produce. Determina quién accede a recursos, quién trabaja en las minas y quién puede atravesar el Domo.
+<br><br>
+Existen indicios de que la <strong>Unidad de Integridad Informativa</strong> ha alterado o eliminado registros históricos que contradecían el relato fundacional.`,
+      footer: 'Clasificación: Estructura Política Clase-A. Datos adicionales disponibles en Terminal Imperial.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Generaciones', val: 'IX desde la fundación' },
+        { key: 'Control', val: 'Político, económico, informativo y simbólico' },
+        { key: 'Base económica', val: 'Monopolio del Veridium' }
+      ]
+    },
+
+    'sectores mineros': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-004',
+      title: 'Sectores Mineros',
+      desc: `Zonas de extracción del Veridium ubicadas en los extremos perimetrales de la isla. Son el origen material de toda la riqueza imperial y la base de su poder geopolítico.
+<br><br>
+La versión oficial describe condiciones de trabajo certificadas, rotaciones regulares y supervisión médica. Los registros interceptados presentan una realidad diferente: jornadas de catorce horas, ausencia de ventilación adecuada, y trabajadores identificados únicamente por números de asignación. La esperanza de vida desde la primera asignación en minas profundas es de aproximadamente <strong>doce años</strong>.
+<br><br>
+Los mineros que desarrollan el <strong>Síndrome de Exposición Verde</strong> en fases avanzadas son trasladados a instalaciones de contención. No se han documentado regresos.`,
+      footer: 'Clasificación: Infraestructura Económica Clase-B. Registros completos requieren autorización de nivel S.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Ubicación', val: 'Perímetro exterior — Sector D, F, G' },
+        { key: 'Personal', val: 'Sin registro nominal — asignación numérica' },
+        { key: 'Supervisión', val: 'F.O.R.J.A. — Acceso restringido' }
+      ]
+    },
+
+    'aster': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-005',
+      title: 'Aster',
+      desc: `Ciudad-estado construida sobre una isla estratégica, rodeada de rutas marítimas y barreras montañosas naturales. Único territorio en el que se ha localizado Veridium, lo que le otorga una posición geopolítica singular y, hasta el momento, irremplazable.
+<br><br>
+Su estructura urbana se organiza en capas concéntricas: el <strong>Domo</strong> en el centro, el anillo de operaciones militares e industriales, las zonas habitacionales de integración y los sectores de extracción en el perímetro. La distancia al centro no es solo geográfica: es jerárquica.
+<br><br>
+Fuera del Domo, en los suburbios periféricos, existen mercados clandestinos, talleres no registrados y redes de resistencia que el Imperio no ha conseguido desmantelar.`,
+      footer: 'Clasificación: Territorio Imperial. Coordenadas geográficas: acceso restringido.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Tipo', val: 'Ciudad-estado insular' },
+        { key: 'Recurso clave', val: 'Veridium — monopolio absoluto' },
+        { key: 'Zona conflictiva', val: 'Suburbios periféricos' }
+      ]
+    },
+
+    'linaje': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-006',
+      title: 'Linaje Imperial',
+      desc: `Concepto organizador de toda la sociedad de Aster. El llamado <strong>linaje puro</strong> determina el acceso al Domo, la asignación de recursos, la posición dentro del sistema productivo y la cobertura de salud disponible para cada ciudadano.
+<br><br>
+La narrativa oficial presenta el linaje como una condición biológica: la sangre del fundador resuena con el Veridium. Los registros filtrados de la Bóveda de los Nombres sugieren que la noción de pureza no aparece en los archivos más antiguos, sino que surge como construcción institucional durante la consolidación del poder imperial.
+<br><br>
+El acceso al Domo está regulado por tecnología, no por genética. Lo que el sistema llama <em>reconocimiento biológico</em> es, según fuentes no verificadas, el resultado de un chip de identificación implantado en cada ciudadano desde su nacimiento.`,
+      footer: 'Clasificación: Ideología Fundacional — Clase-A. Árbol genealógico completo: Archivos Clase-V.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Generaciones', val: 'IX — Velk como apellido fundacional' },
+        { key: 'Verificación', val: 'Tecnológica (chip). No biológica.' },
+        { key: 'Archivos', val: 'Genealogía parcialmente reconstruida por Selene Olrac' }
+      ]
+    },
+
+    'hall varrow': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-007',
+      title: 'Hall Varrow',
+      desc: `Ex-científico imperial adscrito al Laboratorio 7, Dirección de Estabilidad Cognitiva. Responsable del desarrollo y perfeccionamiento de la sustancia <strong>VX-13</strong>: el único investigador que logró reducir su toxicidad a niveles compatibles con el consumo humano prolongado.
+<br><br>
+Su clasificación imperial, CV-0441-HV, fue revocada en el Ciclo 872 tras su desaparición del sistema. El Alto Consejo lo clasifica como desertor en búsqueda activa. Los registros personales filtrados sugieren que abandonó el proyecto tras descubrir para qué se utilizaría su trabajo.
+<br><br>
+Padre de <strong>Linet Varrow</strong>, propietaria del taller clandestino de tecnología de máscaras conocido como <em>La Segunda Piel</em>. Su reaparición en el Ciclo 882 y su muerte posterior dejaron pendiente el paradero del método de refinamiento completo del VX-13.`,
+      footer: 'Estado: DESERTOR — BÚSQUEDA ACTIVA. Registros completos en Archivos Clase-V.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'ID Imperial', val: 'CV-0441-HV (Revocado)' },
+        { key: 'Estado', val: 'Fallecido — Ciclo 882' },
+        { key: 'Archivos', val: 'Log personal descifrado — disponible en Archivos' }
+      ]
+    },
+
+    'vx-13': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-008',
+      title: 'VX-13',
+      desc: `Compuesto derivado del Veridium, desarrollado en el Laboratorio 7 del Alto Consejo bajo la dirección del Dr. Hall Varrow. Actúa directamente sobre el hipocampo, produciendo euforia, relajación y, en uso prolongado, pérdida selectiva de recuerdos.
+<br><br>
+El VX-13 en estado bruto es letal. Varrow fue el único científico que logró refinarlo hasta convertirlo en un compuesto <em>consumible sin manifestaciones visibles inmediatas</em>. La formulación actual permite más de una década de uso continuo antes de que la desfiguración física se vuelva evidente.
+<br><br>
+El Imperio distribuye la sustancia de forma encubierta en los suburbios, sin conocimiento de la población consumidora. Su circulación está completamente prohibida dentro del Domo. El objetivo no es médico: es <strong>estabilización social</strong>.`,
+      footer: 'Clasificación: Compuesto de Control Cognitivo — Clase-A. No distribuir esta información.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Desarrollo', val: 'Hall Varrow — Lab. 7, Ciclo 871' },
+        { key: 'Distribución', val: 'Encubierta — Suburbios periféricos' },
+        { key: 'Nombre clandestino', val: 'Aurora' }
+      ]
+    },
+
+    'aurora': {
+      type: 'definicion',
+      nodeId: 'NODO-LAB-DEF-009',
+      title: 'Aurora',
+      desc: `Nombre con el que el VX-13 es conocido en los sectores periféricos de Aster. Se comercializa en múltiples formatos: pastillas para dormir, inhaladores, microbebidas y cigarrillos. La población suburbana la percibe como un producto cotidiano asociado al bienestar físico y emocional.
+<br><br>
+Sus efectos iniciales incluyen euforia intensa, relajación profunda y, en dosis más altas, alucinaciones vívidas en las que el consumidor experimenta una vida más estable o próspera. La dependencia se establece con rapidez.
+<br><br>
+El primer signo visible de exposición prolongada es la <strong>tinción verdosa de las escleras</strong>, denominada coloquialmente "ojos de cristal". En fases avanzadas aparecen venas luminosas, pérdida de identidad y disociación cognitiva severa. La sustancia no anestesia el dolor: <em>reescribe qué se recuerda</em>.`,
+      footer: 'Clasificación: Narcótico ilegal — Uso oficial encubierto. Ver expediente VX-13 en Archivos.',
+      redirect: 'archivos.html',
+      meta: [
+        { key: 'Origen real', val: 'VX-13 — Laboratorio 7' },
+        { key: 'Marca clandestina', val: 'Aurora' },
+        { key: 'Signo de exposición', val: 'Escleras verdosas (irreversible)' }
+      ]
+    }
+  };
+
+  var REPORTS = {
+    'mascaras': {
+      type: 'informe',
+      nodeId: 'NODO-LAB-REP-001',
+      title: 'Tecnología de Máscaras — Actividad Detectada',
+      label: 'INFORME DE ACTIVIDAD SOSPECHOSA',
+      text1: `La Unidad de Integridad Informativa ha registrado un incremento sostenido en la circulación de dispositivos de camuflaje facial no autorizados en los sectores periféricos de Aster. Estos dispositivos, fabricados mediante polímeros bio-adaptativos de origen desconocido, son capaces de alterar los rasgos faciales y la voz del portador, eludiendo los sistemas de reconocimiento estándar vinculados al Chip Ciudadano.
+<br><br>
+<strong>La actividad de producción ha sido localizada en los suburbios sur y este.</strong> Se han identificado al menos tres centros de manufactura activos, aunque su estructura descentralizada dificulta la intervención directa. Los artesanos responsables operan bajo identidades múltiples, haciendo uso de la misma tecnología que producen.`,
+      text2: `La amenaza que representa esta tecnología para el orden imperial es de naturaleza sistémica. Una persona que porta una máscara es, para el sistema de identificación, un <strong>fantasma</strong>: su presencia no puede ser rastreada, sus movimientos no quedan registrados y su acceso a zonas restringidas no puede ser verificado.
+<br><br>
+El uso prolongado de estos dispositivos presenta riesgos físicos documentados: necrosis facial, rechazo cutáneo y dependencia psicológica. Sin embargo, estos efectos no reducen la demanda en los sectores donde el ocultamiento de identidad representa la única forma de movilidad posible.`,
+      restricted: {
+        title: 'Sección Clasificada — Detalles Operativos',
+        sub: 'El contenido de esta sección requiere autorización de nivel Clase-A emitida por el Alto Consejo de Aster.\nAcceso detectado: CLASE-C // Terminal Estándar\nContacte con su coordinador de sector para solicitar elevación de permisos.',
+        code: 'ERR-0077 // PROTOCOLO DE COMPARTIMENTACIÓN ACTIVO'
+      },
+      footer: 'Informe emitido por: Unidad de Integridad Informativa — Ciclo 882. Distribución interna. No compartir.'
+    },
+
+    'tecnologias ilegales': {
+      type: 'informe',
+      nodeId: 'NODO-LAB-REP-002',
+      title: 'Tecnologías Ilegales — Evaluación de Riesgo',
+      label: 'INFORME DE EVALUACIÓN DE AMENAZA IMPERIAL',
+      text1: `El ecosistema tecnológico clandestino de los sectores periféricos de Aster constituye una amenaza activa para la estabilidad del orden imperial. La proliferación de dispositivos y sustancias no autorizadas ha alcanzado un nivel que excede la capacidad de intervención puntual de las unidades de F.O.R.J.A.
+<br><br>
+Las categorías de mayor riesgo identificadas son: <strong>dispositivos de alteración de identidad</strong> (máscaras sintéticas), <strong>sustancias de modificación cognitiva</strong> de origen no controlado, y sistemas de comunicación cifrada operados por grupos no identificados. Todas estas tecnologías comparten una característica: fueron diseñadas para hacer invisible a quien las usa.`,
+      text2: `El riesgo no reside únicamente en el uso individual de estas tecnologías, sino en su capacidad para articular redes de coordinación. Un sistema en el que la identidad puede ser reemplazada, la memoria alterada y las comunicaciones cifradas representa un escenario donde <strong>el control imperial sobre la información se vuelve inestable</strong>.
+<br><br>
+Existen indicios de que parte de la tecnología en circulación tiene origen en el propio aparato imperial. Algunos dispositivos presentan componentes que no pueden ser producidos fuera del Laboratorio 7, lo que sugiere filtración interna o desvío deliberado de materiales clasificados.`,
+      restricted: {
+        title: 'Sección Clasificada — Origen de las Tecnologías',
+        sub: 'El contenido de esta sección requiere autorización de nivel Clase-S emitida por el Soberano.\nAcceso detectado: CLASE-C // Terminal Estándar\nSolicitud registrada. Personal de seguridad notificado.',
+        code: 'ERR-0091-C // PROTOCOLO DE CONTENCIÓN ACTIVO'
+      },
+      footer: 'Evaluación clasificada — F.O.R.J.A. / Unidad de Inteligencia Interior — Ciclo 882. No distribuir.'
+    }
+  };
+
+  // Variantes de términos -> término base
+  var TERM_ALIASES = {
+    'domo': 'el domo',
+    'domo imperial': 'el domo',
+    'el domo': 'el domo',
+    'mineral': 'veridium',
+    'el mineral verde': 'veridium',
+    'verde': 'veridium',
+    'veridium': 'veridium',
+    'el imperio': 'el imperio',
+    'imperio': 'el imperio',
+    'emperador': 'el imperio',
+    'sector minero': 'sectores mineros',
+    'sectores mineros': 'sectores mineros',
+    'minas': 'sectores mineros',
+    'mina': 'sectores mineros',
+    'aster': 'aster',
+    'linaje': 'linaje',
+    'linaje imperial': 'linaje',
+    'hall varrow': 'hall varrow',
+    'varrow': 'hall varrow',
+    'vx-13': 'vx-13',
+    'aurora': 'aurora',
+    'mascaras': 'mascaras',
+    'mascara': 'mascaras',
+    'tecnologias ilegales': 'tecnologias ilegales',
+    'tecnologia ilegal': 'tecnologias ilegales'
+  };
+
+  /* ════════════════════════════════════════════════════════
+     HISTORIAL
+  ════════════════════════════════════════════════════════ */
+  var searchHistory = [];
+
+  function addToHistory(term) {
+    if (searchHistory.indexOf(term) === -1) {
+      searchHistory.unshift(term);
+      if (searchHistory.length > 6) searchHistory.pop();
+    }
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (searchHistory.length === 0) return;
+    var histEl = document.getElementById('searchHistory');
+    var tagsEl = document.getElementById('historyTags');
+    histEl.style.display = 'block';
+    tagsEl.innerHTML = '';
+    for (var i = 0; i < searchHistory.length; i++) {
+      (function(t){
+        var tag = document.createElement('span');
+        tag.className = 'search-history__tag';
+        tag.textContent = t;
+        tag.onclick = function(){ fillSearch(t); };
+        tagsEl.appendChild(tag);
+      })(searchHistory[i]);
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     VALIDACIÓN DE INPUT
+  ════════════════════════════════════════════════════════ */
+  function validateInput(raw) {
+    var trimmed = raw.trim();
+    if (trimmed.length === 0) return { valid: false, msg: '> entrada inválida: el campo no puede estar vacío' };
+
+    // Solo letras (incluyendo tildes y ñ), números, guiones y espacios
+    if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s\-]+$/.test(trimmed)) {
+      return { valid: false, msg: '> entrada inválida: solo se permiten letras, números y guiones' };
+    }
+
+    // Máximo 3 palabras
+    var words = trimmed.split(/\s+/);
+    if (words.length > 3) {
+      return { valid: false, msg: '> entrada inválida: máximo 3 palabras por consulta' };
+    }
+
+    return { valid: true, normalized: trimmed.toLowerCase() };
+  }
+
+  /* ════════════════════════════════════════════════════════
+     BÚSQUEDA
+  ════════════════════════════════════════════════════════ */
+  function doSearch() {
+    var raw = document.getElementById('searchInput').value;
+    var errorEl = document.getElementById('searchError');
+    var procEl = document.getElementById('searchProcessing');
+
+    var validation = validateInput(raw);
+    if (!validation.valid) {
+      errorEl.textContent = validation.msg;
+      var form = document.querySelector('.search-block__form');
+      form.classList.add('shake');
+      setTimeout(function(){ form.classList.remove('shake'); }, 400);
+      return;
+    }
+    errorEl.textContent = '';
+
+    // Mostrar indicador de procesamiento
+    procEl.classList.add('show');
+
+    var query = validation.normalized;
+    addToHistory(query);
+
+    setTimeout(function(){
+      procEl.classList.remove('show');
+      renderResult(query);
+    }, 900);
+  }
+
+  function renderResult(query) {
+    // Resolver alias
+    var baseKey = TERM_ALIASES[query] || null;
+
+    // Buscar en definiciones y reportes
+    var result = null;
+    var resultType = null;
+
+    if (baseKey && DEFINITIONS[baseKey]) {
+      result = DEFINITIONS[baseKey];
+      resultType = 'definicion';
+    } else if (baseKey && REPORTS[baseKey]) {
+      result = REPORTS[baseKey];
+      resultType = 'informe';
+    } else {
+      // Búsqueda directa
+      if (DEFINITIONS[query]) {
+        result = DEFINITIONS[query];
+        resultType = 'definicion';
+      } else if (REPORTS[query]) {
+        result = REPORTS[query];
+        resultType = 'informe';
+      }
+    }
+
+    // Actualizar etiqueta de query
+    document.getElementById('resultQueryLabel').textContent = query;
+
+    // Ocultar pantalla de búsqueda, mostrar resultado
+    document.getElementById('screen-search').style.display = 'none';
+    var resultScreen = document.getElementById('screen-result');
+    resultScreen.classList.add('show');
+
+    var output = document.getElementById('resultOutput');
+
+    if (!result) {
+      output.innerHTML = buildNoResult(query);
+      return;
+    }
+
+    if (resultType === 'definicion') {
+      output.innerHTML = buildDefinicion(result);
+    } else {
+      output.innerHTML = buildInforme(result);
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     CONSTRUCTORES DE HTML
+  ════════════════════════════════════════════════════════ */
+
+  function buildDefinicion(data) {
+    var metaHtml = '';
+    if (data.meta) {
+      metaHtml = '<div class="def-meta-row">';
+      for (var i = 0; i < data.meta.length; i++) {
+        metaHtml += '<span class="def-meta-item"><strong>' + data.meta[i].key + ':</strong>' + data.meta[i].val + '</span>';
+      }
+      metaHtml += '</div>';
+    }
+
+    return '<div class="def-card">' +
+      '<div class="def-card__bar">' +
+        '<span class="def-card__id">' + data.nodeId + '</span>' +
+        '<span class="def-card__type">DEFINICIÓN</span>' +
+      '</div>' +
+      '<div class="def-card__body">' +
+        '<h2 class="def-card__title">' + data.title + '</h2>' +
+        '<p class="def-card__desc">' + data.desc + '</p>' +
+        metaHtml +
+        '<div style="margin-top: var(--space-lg)">' +
+          '<a href="' + data.redirect + '" class="def-card__redirect">Acceder a Archivos Clasificados</a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="def-card__footer">' + data.footer + '</div>' +
+    '</div>';
+  }
+
+  function buildInforme(data) {
+    return '<div class="report-card">' +
+      '<div class="report-card__scan"></div>' +
+      '<div class="report-card__bar">' +
+        '<span class="report-card__id">' + data.nodeId + '</span>' +
+        '<span class="report-card__alert">ACTIVIDAD DETECTADA</span>' +
+      '</div>' +
+      '<div class="report-card__body">' +
+        '<p class="report-card__label">' + data.label + '</p>' +
+        '<h2 class="report-card__title">' + data.title + '</h2>' +
+        '<p class="report-card__text">' + data.text1 + '</p>' +
+        '<p class="report-card__text">' + data.text2 + '</p>' +
+
+        '<div class="report-restricted">' +
+          '<div class="report-restricted__scanline"></div>' +
+          '<div class="report-restricted__bar">' +
+            '<div class="report-restricted__dot"></div>' +
+            '<span class="report-restricted__bar-title">SECCIÓN CLASIFICADA — ' + data.nodeId + '</span>' +
+          '</div>' +
+          '<div class="report-restricted__body">' +
+            '<span class="report-restricted__icon">🔒</span>' +
+            '<p class="report-restricted__msg">' + data.restricted.title + '</p>' +
+            '<p class="report-restricted__sub">' + data.restricted.sub.replace(/\n/g, '<br>') + '</p>' +
+            '<span class="report-restricted__code">' + data.restricted.code + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="report-card__footer">' + data.footer + '</div>' +
+    '</div>';
+  }
+
+  function buildNoResult(query) {
+    return '<div class="noresult-card">' +
+      '<span class="noresult-card__icon">⬛</span>' +
+      '<p class="noresult-card__line">no se encontraron resultados para: "' + query + '"</p>' +
+      '<p class="noresult-card__line">el término no está indexado en la base de datos imperial</p>' +
+      '<p class="noresult-card__line">verifique la ortografía o intente un término relacionado</p>' +
+      '<p class="noresult-card__code">ERR-NULL // CONSULTA SIN COINCIDENCIAS // CICLO 882</p>' +
+    '</div>';
+  }
+
+  /* ════════════════════════════════════════════════════════
+     NAVEGACIÓN
+  ════════════════════════════════════════════════════════ */
+  function goBack() {
+    document.getElementById('screen-search').style.display = 'block';
+    var resultScreen = document.getElementById('screen-result');
+    resultScreen.classList.remove('show');
+    document.getElementById('resultOutput').innerHTML = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchInput').focus();
+  }
+
+  function fillSearch(term) {
+    document.getElementById('searchInput').value = term;
+    document.getElementById('searchInput').focus();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     EVENT LISTENERS
+  ════════════════════════════════════════════════════════ */
+  document.getElementById('searchBtn').addEventListener('click', doSearch);
+  document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  // Limpiar error al escribir
+  document.getElementById('searchInput').addEventListener('input', function() {
+    document.getElementById('searchError').textContent = '';
+  });
+  </script>
+</body>
+</html>

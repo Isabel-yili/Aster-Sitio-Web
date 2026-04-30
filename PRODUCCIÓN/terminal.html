@@ -1,0 +1,1585 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Terminal Imperial de ASTER - Sistema Social, Estructura Política, Economía y documentos clasificados del Domo.">
+  <title>ASTER | Terminal Imperial</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ── STAT GRID ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .stat-box {
+      background: rgba(0,5,0,.7);
+      border: 1px solid rgba(57,255,20,.2);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all .3s;
+    }
+    .stat-box:hover {
+      border-color: var(--green-neon);
+      background: rgba(57,255,20,.04);
+    }
+    .stat-box__num {
+      font-family: var(--font-imperial);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: var(--green-neon);
+      text-shadow: 0 0 20px var(--green-glow);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .stat-box__label {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--iron-light);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── MONOPOLY STAT BOX (clickable + glitch) ── */
+    .stat-box--monopoly {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-box--monopoly:hover {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 20px rgba(57,255,20,.12);
+    }
+    .stat-box--monopoly::after {
+      content: '[ ACCEDER ]';
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-code);
+      font-size: .5rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .stat-box--monopoly:hover::after { opacity: 1; }
+
+    .stat-box--monopoly .stat-box__num.glitching {
+      animation: monopolyGlitch .08s steps(1) forwards;
+      color: #ff4444;
+      text-shadow: 0 0 8px rgba(255,68,68,.6), 2px 0 0 rgba(57,255,20,.4);
+    }
+    @keyframes monopolyGlitch {
+      0%   { transform: translate(0); }
+      20%  { transform: translate(-3px, 1px); }
+      40%  { transform: translate(2px, -1px); }
+      60%  { transform: translate(-1px, 2px); }
+      80%  { transform: translate(3px, 0); }
+      100% { transform: translate(0); }
+    }
+
+    /* ── MONOPOLY MODAL ── */
+    .monopoly-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(6px);
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .monopoly-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .monopoly-panel {
+      position: relative;
+      width: min(720px, 92vw);
+      max-height: 85vh;
+      overflow-y: auto;
+      background: rgba(0,5,0,.97);
+      border: 1px solid rgba(57,255,20,.3);
+      border-top: 3px solid var(--green-neon);
+      box-shadow: 0 0 60px rgba(57,255,20,.12);
+      animation: panelSlideIn .35s ease forwards;
+    }
+    @keyframes panelSlideIn {
+      from { transform: translateY(30px) scale(.97); opacity:0; }
+      to   { transform: translateY(0) scale(1); opacity:1; }
+    }
+    .monopoly-panel__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(4px);
+    }
+    .monopoly-panel__bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .monopoly-panel__dots { display: flex; gap: 5px; }
+    .monopoly-panel__dot { width: 8px; height: 8px; border-radius: 50%; }
+    .monopoly-panel__dot:nth-child(1) { background: #ff4444; }
+    .monopoly-panel__dot:nth-child(2) { background: var(--brass); }
+    .monopoly-panel__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .monopoly-panel__title {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .monopoly-panel__close {
+      background: transparent;
+      border: 1px solid rgba(255,68,68,.4);
+      color: #ff4444;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all .2s;
+    }
+    .monopoly-panel__close:hover { background: #ff4444; color: #000; }
+    .monopoly-panel__body { padding: var(--space-xl); }
+    .monopoly-panel__alert {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: rgba(255,68,68,.08);
+      border: 1px solid rgba(255,68,68,.35);
+      margin-bottom: var(--space-lg);
+    }
+    .monopoly-panel__alert-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .monopoly-panel__alert-text {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: #ff4444;
+      letter-spacing: 1px;
+    }
+    .monopoly-panel__content-title {
+      font-family: var(--font-imperial);
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: var(--space-md);
+    }
+    .monopoly-panel__content-title span { color: var(--green-neon); }
+    .monopoly-panel__text {
+      font-family: var(--font-code);
+      font-size: .84rem;
+      color: var(--iron-light);
+      line-height: 2;
+      margin-bottom: var(--space-md);
+    }
+    .monopoly-panel__text strong { color: var(--bronze-light); }
+    .monopoly-panel__footer {
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px solid rgba(57,255,20,.15);
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+
+    /* ── EXPORT FLOW — INTERACTIVE PANEL ── */
+    .flow-panel {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      background: rgba(0,5,0,.85);
+      border: 1px solid rgba(57,255,20,.2);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+      min-height: 380px;
+    }
+    @media(max-width:700px) {
+      .flow-panel { grid-template-columns: 1fr; }
+      .flow-panel__sidebar { border-right: none; border-bottom: 1px solid rgba(57,255,20,.15); }
+    }
+    .flow-panel__sidebar {
+      border-right: 1px solid rgba(57,255,20,.15);
+      background: rgba(0,8,0,.6);
+    }
+    .flow-panel__sidebar-header {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid rgba(57,255,20,.12);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .flow-panel__nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .25s;
+      border-bottom: 1px solid rgba(57,255,20,.05);
+    }
+    .flow-panel__nav-item:hover {
+      background: rgba(57,255,20,.05);
+      border-left-color: var(--green-dim);
+    }
+    .flow-panel__nav-item.active {
+      background: rgba(57,255,20,.08);
+      border-left-color: var(--green-neon);
+    }
+    .flow-panel__nav-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .flow-panel__nav-label {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--iron-light);
+      letter-spacing: 1px;
+    }
+    .flow-panel__nav-item.active .flow-panel__nav-label { color: var(--green-neon); }
+    .flow-panel__nav-step {
+      font-family: var(--font-code);
+      font-size: .55rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .flow-panel__content {
+      padding: var(--space-xl);
+      position: relative;
+    }
+    .flow-panel__phase {
+      display: none;
+      animation: fadePanelIn .4s ease;
+    }
+    .flow-panel__phase.active { display: block; }
+    @keyframes fadePanelIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .flow-panel__phase-label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+      display: block;
+    }
+    .flow-panel__phase-title {
+      font-family: var(--font-imperial);
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: var(--space-md);
+    }
+    .flow-panel__phase-img {
+      width: 45%;
+      max-width: 260px;
+      float: right;
+      margin: 0 0 var(--space-md) var(--space-lg);
+      border: 1px solid rgba(218,165,32,.2);
+      filter: saturate(.7);
+      transition: filter .3s;
+    }
+    .flow-panel__phase-img:hover { filter: saturate(1); }
+    .flow-panel__phase-text {
+      font-family: var(--font-code);
+      font-size: .82rem;
+      color: var(--iron-light);
+      line-height: 1.9;
+      margin-bottom: var(--space-md);
+    }
+    .flow-panel__phase-notes {
+      clear: both;
+      background: rgba(57,255,20,.04);
+      border: 1px solid rgba(57,255,20,.15);
+      border-left: 3px solid var(--green-neon);
+      padding: var(--space-md);
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--green-dim);
+      line-height: 1.8;
+    }
+    .flow-panel__phase-notes strong { color: var(--green-neon); }
+
+    /* ── MINE SECTION — GLITCH TEXT ── */
+    .mine-glitch-wrap {
+      position: relative;
+      font-family: var(--font-code);
+      font-size: .82rem;
+      color: var(--iron-light);
+      line-height: 1.9;
+    }
+    .mine-glitch-char {
+      display: inline;
+      transition: color .05s;
+    }
+    .mine-glitch-char.flipping {
+      color: var(--green-neon);
+      text-shadow: 0 0 6px var(--green-glow);
+    }
+
+    /* ── MINE SECRET GEAR ── */
+    .mine-secret-trigger {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      opacity: .22;
+      transition: opacity .3s;
+      z-index: 5;
+    }
+    .mine-secret-trigger:hover { opacity: .65; }
+    .mine-secret-trigger svg {
+      width: 100%;
+      height: 100%;
+      animation: gearRotateSlow 14s linear infinite;
+    }
+    @keyframes gearRotateSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .mine-code-gate {
+      display: none;
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      background: rgba(0,8,0,.9);
+      border: 1px solid rgba(57,255,20,.2);
+      text-align: center;
+      animation: fadePanelIn .3s ease;
+    }
+    .mine-code-gate.show { display: block; }
+    .mine-code-gate__label {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-sm);
+      display: block;
+    }
+    .mine-code-gate__form {
+      display: flex;
+      gap: 8px;
+      max-width: 300px;
+      margin: 0 auto var(--space-sm);
+    }
+    .mine-code-gate__input {
+      flex: 1;
+      background: rgba(0,10,0,.9);
+      border: 1px solid var(--green-dim);
+      padding: 8px 12px;
+      color: var(--green-neon);
+      font-family: var(--font-code);
+      font-size: .9rem;
+      outline: none;
+      letter-spacing: 4px;
+      text-align: center;
+      transition: border-color .3s;
+    }
+    .mine-code-gate__input:focus { border-color: var(--green-neon); }
+    .mine-code-gate__btn {
+      background: transparent;
+      border: 1px solid var(--green-neon);
+      color: var(--green-neon);
+      padding: 8px 14px;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all .3s;
+    }
+    .mine-code-gate__btn:hover { background: var(--green-neon); color: var(--bg-darker); }
+    .mine-code-gate__error {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: #ff4444;
+      min-height: 1em;
+      letter-spacing: 1px;
+    }
+
+    .mine-real-content {
+      display: none;
+      animation: fadePanelIn .5s ease;
+      margin-top: var(--space-md);
+    }
+    .mine-real-content.show { display: block; }
+    .mine-real-header {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(57,255,20,.2);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ── MINE RECORD ── */
+    .mine-record {
+      background: rgba(10,5,0,.85);
+      border: 1px solid rgba(201,109,31,.25);
+      border-left: 3px solid var(--copper);
+      padding: var(--space-lg);
+      margin: var(--space-md) 0;
+      position: relative;
+    }
+    .mine-record__id {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--copper);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-sm);
+    }
+    .mine-record__body {
+      font-size: .85rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+    }
+    .mine-record__body strong { color: var(--bronze-light); }
+
+    /* ── CHIP DIAGRAM ── */
+    .chip-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+      padding: var(--space-xl);
+      background: rgba(0,5,0,.7);
+      border: 1px solid rgba(57,255,20,.15);
+      position: relative;
+    }
+    .chip-diagram__body-svg { width: 100%; max-width: 100%; opacity: .9; display: block; }
+    .chip-diagram__label {
+      font-family: var(--font-code);
+      font-size: .7rem;
+      color: var(--green-neon);
+      letter-spacing: 2px;
+      text-align: center;
+    }
+    .chip-diagram__note {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--iron-gray);
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.7;
+    }
+
+    /* ── CHIP HIDDEN TRIGGER (gear icon, bottom-right of node) ── */
+    .chip-secret-trigger {
+      position: absolute;
+      bottom: var(--space-md);
+      right: var(--space-md);
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      opacity: .18;
+      transition: opacity .3s;
+      z-index: 5;
+    }
+    .chip-secret-trigger:hover { opacity: .55; }
+    .chip-secret-trigger svg {
+      width: 100%;
+      height: 100%;
+      animation: gearRotateSlow 18s linear infinite;
+    }
+
+    /* ── CHIP HIDDEN PANEL ── */
+    .chip-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(6px);
+      z-index: 9100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .chip-overlay.active { opacity: 1; pointer-events: all; }
+    .chip-panel {
+      position: relative;
+      width: min(780px, 93vw);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: rgba(0,5,0,.97);
+      border: 1px solid rgba(57,255,20,.3);
+      border-top: 3px solid var(--green-neon);
+      box-shadow: 0 0 60px rgba(57,255,20,.1);
+      animation: panelSlideIn .35s ease forwards;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green-dim) transparent;
+    }
+    .chip-panel__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(4px);
+    }
+    .chip-panel__bar-left { display: flex; align-items: center; gap: var(--space-md); }
+    .chip-panel__dots { display: flex; gap: 5px; }
+    .chip-panel__dot { width: 8px; height: 8px; border-radius: 50%; }
+    .chip-panel__dot:nth-child(1) { background: #ff4444; }
+    .chip-panel__dot:nth-child(2) { background: var(--brass); }
+    .chip-panel__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .chip-panel__title {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .chip-panel__close {
+      background: transparent;
+      border: 1px solid rgba(255,68,68,.4);
+      color: #ff4444;
+      font-family: var(--font-code);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all .2s;
+    }
+    .chip-panel__close:hover { background: #ff4444; color: #000; }
+    .chip-panel__body { padding: var(--space-xl); }
+
+    /* ── POLITICAL DIRECTORY PANEL ── */
+    .dir-panel {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      background: rgba(0,5,0,.85);
+      border: 1px solid rgba(57,255,20,.2);
+      overflow: hidden;
+      margin: var(--space-lg) 0;
+      min-height: 400px;
+    }
+    @media(max-width:700px) {
+      .dir-panel { grid-template-columns: 1fr; }
+      .dir-panel__sidebar { border-right: none; border-bottom: 1px solid rgba(57,255,20,.15); }
+    }
+    .dir-panel__sidebar {
+      border-right: 1px solid rgba(57,255,20,.15);
+      background: rgba(0,8,0,.6);
+    }
+    .dir-panel__sidebar-header {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid rgba(57,255,20,.12);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .dir-panel__nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .25s;
+      border-bottom: 1px solid rgba(57,255,20,.05);
+    }
+    .dir-panel__nav-item:hover {
+      background: rgba(57,255,20,.05);
+      border-left-color: var(--green-dim);
+    }
+    .dir-panel__nav-item.active {
+      background: rgba(57,255,20,.08);
+      border-left-color: var(--green-neon);
+    }
+    .dir-panel__nav-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .dir-panel__nav-label {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--iron-light);
+      letter-spacing: 1px;
+    }
+    .dir-panel__nav-item.active .dir-panel__nav-label { color: var(--green-neon); }
+    .dir-panel__content { padding: var(--space-xl); position: relative; }
+    .dir-panel__entity {
+      display: none;
+      animation: fadePanelIn .4s ease;
+    }
+    .dir-panel__entity.active { display: block; }
+    .dir-panel__entity-label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+      display: block;
+    }
+    .dir-panel__entity-title {
+      font-family: var(--font-imperial);
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: var(--space-md);
+    }
+    .dir-panel__entity-img {
+      width: 45%;
+      max-width: 240px;
+      float: right;
+      margin: 0 0 var(--space-md) var(--space-lg);
+      border: 1px solid rgba(218,165,32,.2);
+      filter: saturate(.6);
+      transition: filter .3s;
+    }
+    .dir-panel__entity-img:hover { filter: saturate(1); }
+    .dir-panel__entity-text {
+      font-family: var(--font-code);
+      font-size: .82rem;
+      color: var(--iron-light);
+      line-height: 1.9;
+      margin-bottom: var(--space-md);
+    }
+    .dir-panel__entity-text strong { color: var(--bronze-light); }
+    .dir-panel__entity-notes {
+      clear: both;
+      background: rgba(218,165,32,.04);
+      border: 1px solid rgba(218,165,32,.2);
+      border-left: 3px solid var(--brass);
+      padding: var(--space-md);
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      margin: var(--space-lg) 0;
+      padding-left: var(--space-xl);
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, var(--brass), var(--green-neon), transparent);
+    }
+    .timeline__item {
+      position: relative;
+      margin-bottom: var(--space-lg);
+    }
+    .timeline__item::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--space-xl) + 8px);
+      top: 6px;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--green-neon);
+      box-shadow: 0 0 8px var(--green-glow);
+    }
+    .timeline__age {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .timeline__title {
+      font-family: var(--font-imperial);
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 6px;
+    }
+    .timeline__body {
+      font-size: .83rem;
+      color: var(--iron-light);
+      line-height: 1.7;
+    }
+
+    /* ── EXPORT FLOW (legacy, hidden) ── */
+    .export-flow { display: none; }
+
+    /* ── DOMO ACCESS RESTRICTED BLOCK ── */
+    .access-restricted {
+      margin-top: var(--space-xl);
+      background: rgba(0,5,0,.85);
+      border: 1px solid rgba(255,68,68,.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .access-restricted__scan {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,68,68,.6), transparent);
+      animation: scanRestricted 3.5s linear infinite;
+    }
+    @keyframes scanRestricted {
+      0%   { top: 0; opacity: .8; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .access-restricted__bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      background: rgba(255,68,68,.06);
+      border-bottom: 1px solid rgba(255,68,68,.15);
+    }
+    .access-restricted__bar-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #ff4444;
+      animation: dotBlink 1.8s ease-in-out infinite;
+    }
+    @keyframes dotBlink {
+      0%,100% { opacity: 1; } 50% { opacity: .3; }
+    }
+    .access-restricted__bar-title {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: rgba(255,68,68,.7);
+      letter-spacing: 2px;
+    }
+    .access-restricted__body {
+      padding: var(--space-xl);
+      text-align: center;
+    }
+    .access-restricted__icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: var(--space-md);
+      filter: drop-shadow(0 0 8px rgba(255,68,68,.4));
+    }
+    .access-restricted__msg {
+      font-family: var(--font-imperial);
+      font-size: 1.2rem;
+      color: rgba(255,100,100,.85);
+      margin-bottom: var(--space-sm);
+    }
+    .access-restricted__sub {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: rgba(255,68,68,.5);
+      letter-spacing: 2px;
+      line-height: 1.8;
+    }
+    .access-restricted__code {
+      display: inline-block;
+      margin-top: var(--space-md);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: rgba(255,68,68,.35);
+      letter-spacing: 3px;
+    }
+    /* Subtle glitch on restricted block */
+    .access-restricted__msg.glitch-flicker {
+      animation: restrictedFlicker .12s steps(1) 3;
+    }
+    @keyframes restrictedFlicker {
+      0%,100% { opacity: 1; } 50% { opacity: .2; }
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+    .shake { animation: shake .4s ease; }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <span class="loader__text">ACCEDIENDO A TERMINAL...</span>
+    <div class="loader__bar"><div class="loader__progress"></div></div>
+  </div>
+  <div class="particles" id="particles"></div>
+  <div class="gear-container">
+    <div class="gear"><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div></div>
+    <div class="gear gear--small"><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div></div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav__logo">ASTER</a>
+    <div class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="index.html" class="nav__link">Inicio</a></li>
+      <li><a href="terminal.html" class="nav__link active">Terminal</a></li>
+      <li><a href="laboratorio.html" class="nav__link">Laboratorio</a></li>
+      <li><a href="archivos.html" class="nav__link">Archivos</a></li>
+    </ul>
+  </nav>
+
+  <header class="page-header">
+    <p class="page-header__breadcrumb"><a href="index.html">ASTER</a> / TERMINAL</p>
+    <h1 class="page-header__title glitch" data-text="Terminal Imperial">Terminal Imperial</h1>
+    <p class="page-header__desc">Acceso autorizado a nodos del sistema imperial. Clasificación: restringida.</p>
+  </header>
+
+  <main class="section">
+    <div class="tabs">
+      <div class="tabs__nav">
+        <button class="tabs__btn active" data-tab="economia">Economía &amp; Veridium</button>
+        <button class="tabs__btn" data-tab="sistema">Sistema Social</button>
+        <button class="tabs__btn" data-tab="politica">Estructura Política</button>
+      </div>
+
+      <!-- ══════════════════════════════════
+           TAB: ECONOMÍA & MINERAL
+      ══════════════════════════════════ -->
+      <div class="tabs__panel active" id="tab-economia">
+
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-ECO-001</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Veridium — Recurso Estratégico Imperial</h3>
+          <div class="node__content">
+            <p>El Veridium ha sido clasificado por la entidad científica imperial como Materia Prima Esencial Clase-A, constituyéndose como la principal fuente de energía renovable que sustenta el desarrollo continuo de nuestra civilización.</p>
+            <p>Localizado en altas concentraciones únicamente en los territorios de Aster, el Veridium ocupa una posición central dentro del equilibrio energético global. Su composición no corresponde a ningún elemento registrado en periodos anteriores a la fundación del Domo, lo que refuerza su carácter excepcional y su valor estratégico incalculable.</p>
+            <p>El descubrimiento de este recurso se atribuye a la línea de investigación iniciada por la familia Velk, descendientes directos de Asteria Velk, fundadora de nuestra nación. Fue a partir de estos estudios que se identificó no solo su potencial energético, sino también su estrecha relación con la formación del Domo.</p>
+            <p>De acuerdo con los registros imperiales, la acumulación natural de Veridium en el subsuelo de Aster generó una manifestación energética sin precedentes, dando origen al Domo: una estructura de contención y protección que resguarda el núcleo de nuestra civilización.</p>
+            <p>Desde generaciones, se reconoce que únicamente aquellos con linaje legítimo dentro de Aster pueden atravesar sus límites, consolidando así un orden social basado en pertenencia, continuidad y estabilidad.</p>
+            <p>En la actualidad, el Domo alberga el centro operativo del Imperio: un entorno urbano altamente desarrollado, sostenido por infraestructuras avanzadas y sistemas de gestión que garantizan la eficiencia y permanencia del modelo imperial.</p>
+
+            <!-- STAT GRID — solo el primero es interactivo -->
+            <div class="stat-grid">
+              <!-- MONOPOLY BOX — clickable + glitch -->
+              <div class="stat-box stat-box--monopoly" id="monopolyBox" onclick="openMonopolyPanel()">
+                <span class="stat-box__num" id="monopolyNum">100%</span>
+                <span class="stat-box__label">Monopolio global</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box__num">∞</span>
+                <span class="stat-box__label">Fuente renovable</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box__num">9+</span>
+                <span class="stat-box__label">Generaciones explotándolo</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box__num">0</span>
+                <span class="stat-box__label">Sustitutos conocidos</span>
+              </div>
+            </div>
+            <p style="margin-top:var(--space-md)"><em style="font-family:var(--font-code);font-size:.75rem;color:var(--green-dim)">> Fuente secundaria: Informe de comercio exterior, ciclo 877. Filtrado por Selene Olrac, Archivo Independiente.</em></p>
+          </div>
+        </div>
+
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-ECO-002</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Infraestructura y Distribución Energética</h3>
+          <div class="node__content">
+            <p>El funcionamiento de Aster se sostiene a través de un sistema integral basado en el aprovechamiento y gestión del Veridium, garantizando la estabilidad y continuidad de todos los sectores del Imperio.</p>
+            <p>El proceso de gestión del recurso se estructura de la siguiente manera:</p>
+
+            <!-- INTERACTIVE FLOW PANEL -->
+            <div class="flow-panel" id="flowPanel">
+              <div class="flow-panel__sidebar">
+                <div class="flow-panel__sidebar-header">//&nbsp;FASES DEL PROCESO</div>
+                <div class="flow-panel__nav-item active" data-phase="phase-ext" onclick="switchFlowPhase(this, 'phase-ext')">
+                  <div>
+                    <div class="flow-panel__nav-step">FASE 01</div>
+                    <div class="flow-panel__nav-label">Extracción</div>
+                  </div>
+                </div>
+                <div class="flow-panel__nav-item" data-phase="phase-ref" onclick="switchFlowPhase(this, 'phase-ref')">
+                  <div>
+                    <div class="flow-panel__nav-step">FASE 02</div>
+                    <div class="flow-panel__nav-label">Procesamiento</div>
+                  </div>
+                </div>
+                <div class="flow-panel__nav-item" data-phase="phase-dist" onclick="switchFlowPhase(this, 'phase-dist')">
+                  <div>
+                    <div class="flow-panel__nav-step">FASE 03</div>
+                    <div class="flow-panel__nav-label">Distribución</div>
+                  </div>
+                </div>
+                <div class="flow-panel__nav-item" data-phase="phase-int" onclick="switchFlowPhase(this, 'phase-int')">
+                  <div>
+                    <div class="flow-panel__nav-step">FASE 04</div>
+                    <div class="flow-panel__nav-label">Integración</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flow-panel__content">
+                <!-- FASE 01: Extracción -->
+                <div class="flow-panel__phase active" id="phase-ext">
+                  <span class="flow-panel__phase-label">// FASE 01 — EXTRACCIÓN CONTROLADA</span>
+                  <h4 class="flow-panel__phase-title">Extracción Controlada</h4>
+                  <img src="assets/img/img_tarabajdores_mina.png" alt="Extracción de Veridium" class="flow-panel__phase-img">
+                  <p class="flow-panel__phase-text">Las operaciones de extracción se llevan a cabo en los sectores mineros ubicados en los extremos de la isla. El personal asignado opera bajo protocolos de máxima eficiencia, garantizando el flujo continuo del recurso hacia las instalaciones de procesamiento central.</p>
+                  <p class="flow-panel__phase-text">Cada unidad extractiva es supervisada por un coordinador de sector que reporta directamente al Alto Consejo, asegurando la trazabilidad completa del material desde su punto de origen.</p>
+                  <div class="flow-panel__phase-notes"><strong>// Notas técnicas:</strong> Los niveles de extracción se calibran trimestralmente en función de la demanda energética interna y los compromisos de exportación estratégica. El acceso a las zonas de extracción requiere autorización de nivel B o superior.</div>
+                </div>
+
+                <!-- FASE 02: Procesamiento -->
+                <div class="flow-panel__phase" id="phase-ref">
+                  <span class="flow-panel__phase-label">// FASE 02 — PROCESAMIENTO Y REFINAMIENTO</span>
+                  <h4 class="flow-panel__phase-title">Procesamiento y Refinamiento</h4>
+                  <img src="assets/img/img_camiones.png" alt="Procesamiento de Veridium" class="flow-panel__phase-img">
+                  <p class="flow-panel__phase-text">Una vez extraído, el Veridium bruto es transportado a las instalaciones de refinamiento del anillo intermedio. Allí, equipos especializados procesan el mineral bajo condiciones controladas, separando los componentes energéticos de los residuos inertes.</p>
+                  <p class="flow-panel__phase-text">El proceso de refinamiento estándar produce tres derivados: el condensado energético primario, el estabilizador de ciclo y los subproductos de grado industrial utilizados en manufactura avanzada.</p>
+                  <div class="flow-panel__phase-notes"><strong>// Notas técnicas:</strong> Existen procedimientos de refinamiento de nivel clasificado supervisados exclusivamente por el Laboratorio 7 del Consejo. El acceso a esas especificaciones requiere nivel S. Información no disponible en este terminal.</div>
+                </div>
+
+                <!-- FASE 03: Distribución -->
+                <div class="flow-panel__phase" id="phase-dist">
+                  <span class="flow-panel__phase-label">// FASE 03 — DISTRIBUCIÓN ESTRATÉGICA</span>
+                  <h4 class="flow-panel__phase-title">Distribución Estratégica</h4>
+                  <img src="assets/img/img_cientificos.png" alt="Distribución del Veridium" class="flow-panel__phase-img">
+                  <p class="flow-panel__phase-text">El condensado refinado se distribuye a través de una red de transporte multimodal que conecta las instalaciones de refinamiento con los centros de consumo internos y los puertos de exportación. La red opera en ciclos continuos de 24 horas bajo monitoreo automatizado.</p>
+                  <p class="flow-panel__phase-text">Las rutas de exportación hacia territorios aliados son gestionadas por la División de Comercio Estratégico del Alto Consejo, que establece los volúmenes y precios de cada ciclo en función de la demanda global y los intereses del Imperio.</p>
+                  <div class="flow-panel__phase-notes"><strong>// Notas técnicas:</strong> Las rutas internas están protegidas por escolta permanente de la F.O.R.J.A. Cualquier interrupción no autorizada del suministro activa el Protocolo de Contención Delta.</div>
+                </div>
+
+                <!-- FASE 04: Integración -->
+                <div class="flow-panel__phase" id="phase-int">
+                  <span class="flow-panel__phase-label">// FASE 04 — INTEGRACIÓN EN EL SISTEMA IMPERIAL</span>
+                  <h4 class="flow-panel__phase-title">Integración en el Sistema Imperial</h4>
+                  <img src="assets/img/img_barcos.png" alt="Integración Veridium" class="flow-panel__phase-img">
+                  <p class="flow-panel__phase-text">El producto final se integra en tres vectores principales del sistema imperial: alimentación energética del Domo, reservas estratégicas para contingencias y generación de créditos de intercambio con potencias externas. Este último vector sustenta la posición geopolítica dominante de Aster.</p>
+                  <p class="flow-panel__phase-text">La administración de reservas es responsabilidad directa del Soberano, quien determina los umbrales de almacenamiento mínimo y las condiciones de liberación de emergencia según los protocolos de la Bóveda Central.</p>
+                  <div class="flow-panel__phase-notes"><strong>// Notas técnicas:</strong> Los datos de reservas actuales están clasificados bajo Orden Imperial 0091-C. La publicación no autorizada de cifras de stock constituye traición al Estado según el artículo 17 del Código de Hierro.</div>
+                </div>
+              </div>
+            </div>
+
+            <p>Cada etapa es supervisada para asegurar la máxima eficiencia operativa y el equilibrio entre producción, consumo interno y proyección exterior.</p>
+          </div>
+        </div>
+
+        <!-- ══ NODO-ECO-003: MINAS (propaganda + glitch oculto) ══ -->
+        <div class="node reveal" style="position:relative;">
+          <div class="node__header">
+            <span class="node__id">NODO-ECO-003</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Operaciones de Extracción — Sectores Mineros</h3>
+
+          <!-- Secret gear trigger -->
+          <div class="mine-secret-trigger" id="mineGearTrigger" onclick="toggleMineCode()" title="">
+            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <circle cx="20" cy="20" r="14" stroke="#39FF14" stroke-width="1.5"/>
+              <circle cx="20" cy="20" r="5" fill="#39FF14" opacity=".5"/>
+              <rect x="18.5" y="4" width="3" height="7" rx="1" fill="#39FF14"/>
+              <rect x="18.5" y="29" width="3" height="7" rx="1" fill="#39FF14"/>
+              <rect x="4" y="18.5" width="7" height="3" rx="1" fill="#39FF14"/>
+              <rect x="29" y="18.5" width="7" height="3" rx="1" fill="#39FF14"/>
+              <rect x="8.5" y="9.2" width="3" height="7" rx="1" fill="#39FF14" transform="rotate(45 10 12.7)"/>
+              <rect x="27.5" y="23.8" width="3" height="7" rx="1" fill="#39FF14" transform="rotate(45 29 27.3)"/>
+              <rect x="23.8" y="8.5" width="7" height="3" rx="1" fill="#39FF14" transform="rotate(45 27.3 10)"/>
+              <rect x="9.2" y="27.5" width="7" height="3" rx="1" fill="#39FF14" transform="rotate(45 12.7 29)"/>
+            </svg>
+          </div>
+
+          <div class="node__content">
+            <img src="assets/img/img_operación_de_extraccion.png" alt="Sectores de extracción" class="node__image">
+
+            <!-- PROPAGANDA text (with hidden glitch chars) -->
+            <div class="mine-glitch-wrap" id="mineGlitchWrap"></div>
+
+            <ul style="margin-top:var(--space-md)">
+              <li><strong>Condiciones de trabajo certificadas:</strong> conforme a estándares imperiales de bienestar productivo, con rotaciones regulares y acceso a servicios de salud básica.</li>
+              <li><strong>Reconocimiento por rendimiento:</strong> los trabajadores más eficientes reciben asignaciones de categoría superior y beneficios adicionales dentro del sistema.</li>
+              <li><strong>Expectativa de integración:</strong> tras el cumplimiento del ciclo de servicio, los operarios pasan a funciones de mantenimiento o logística con menor exposición al mineral.</li>
+              <li><strong>Protocolos de estabilidad:</strong> las instalaciones cuentan con sistemas de ventilación, equipamiento de protección y supervisión médica periódica para garantizar la salud del personal activo.</li>
+            </ul>
+
+            <!-- MINE CODE GATE (hidden until gear click) -->
+            <div class="mine-code-gate" id="mineCodeGate">
+              <span class="mine-code-gate__label">> PROTOCOLO DE ACCESO REQUERIDO — INTRODUCE CLAVE DE VERIFICACIÓN</span>
+              <div class="mine-code-gate__form">
+                <input type="text" class="mine-code-gate__input" id="mineCodeInput" placeholder="_ _ _ _" maxlength="4" autocomplete="off" inputmode="numeric">
+                <button class="mine-code-gate__btn" onclick="tryMineCode()">▶ VERIFICAR</button>
+              </div>
+              <p class="mine-code-gate__error" id="mineCodeError"></p>
+            </div>
+
+            <!-- REAL CONTENT (revealed after code) -->
+            <div class="mine-real-content" id="mineRealContent">
+              <div class="mine-real-header">> ACCESO CONCEDIDO — DATOS REALES DE OPERACIÓN // CICLO 879</div>
+              <div class="node__content">
+                <ul>
+                  <li><strong>Jornadas de 14 horas</strong> en túneles sin ventilación adecuada.</li>
+                  <li><strong>Sin identidad registrada:</strong> los trabajadores reciben un número de asignación. Sus nombres no aparecen en ningún documento oficial.</li>
+                  <li><strong>Esperanza de vida:</strong> 12 años desde la primera asignación en minas profundas.</li>
+                  <li><strong>Síndrome de Exposición Verde:</strong> Todos los mineros desarrollan síntomas en distintos grados. Los que sobreviven más de 5 años presentan deformaciones físicas. Son trasladados a "instalaciones de recuperación" de las que no regresan.</li>
+                </ul>
+                <div class="mine-record">
+                  <p class="mine-record__id">REGISTRO INTERCEPTADO — MINA 12, SECTOR D // Ciclo 879</p>
+                  <p class="mine-record__body"><em>"Esta semana fueron tres. Los llevaron en la madrugada. Yo estaba despierto. Vi las escléras del 0447-D cuando pasó por mi cuartucho: completamente verdes. Ya no te miran, esos ojos. Te atraviesan. El capataz dijo que era un accidente. El 0447-D llevaba seis años en las profundas. <strong>No hay accidentes en las profundas. Hay plazos.</strong>"</em></p>
+                  <p class="mine-record__id" style="margin-top:var(--space-sm)">— Autor: desconocido. Nota hallada en pared de barracón. Transcripción: S. Olrac</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           TAB: SISTEMA SOCIAL
+      ══════════════════════════════════ -->
+      <div class="tabs__panel" id="tab-sistema">
+
+        <!-- NODO-SOC-001: CRIANZA ESTATAL (propaganda) -->
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-SOC-001</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Crianza Estatal — Programa de Desarrollo Integral</h3>
+          <div class="node__content">
+            <p>El Programa de Desarrollo Integral constituye uno de los pilares fundamentales del modelo imperial. Su diseño elimina las desigualdades de origen y garantiza que cada ciudadano sea formado según su potencial real, no según las circunstancias de su nacimiento.</p>
+
+            <div class="timeline">
+              <div class="timeline__item">
+                <p class="timeline__age">0–72 horas</p>
+                <p class="timeline__title">Incorporación al Sistema</p>
+                <p class="timeline__body">Desde las primeras horas de vida, cada nuevo ciudadano es incorporado al sistema de desarrollo estatal. Este proceso garantiza igualdad de oportunidades universal: ningún niño hereda las limitaciones de su origen. Los progenitores mantienen acceso regulado durante toda la formación, con visitas programadas que refuerzan el vínculo sin condicionar el desarrollo.</p>
+              </div>
+              <div class="timeline__item">
+                <p class="timeline__age">0–5 años</p>
+                <p class="timeline__title">Formación Temprana Integral</p>
+                <p class="timeline__body">Los primeros años son dedicados al desarrollo cognitivo, emocional y cívico del niño. El currículo de formación temprana integra módulos de cohesión social, comprensión del sistema y desarrollo de habilidades fundamentales. El acompañamiento es continuo, a cargo de educadores especializados certificados por el Alto Consejo.</p>
+              </div>
+              <div class="timeline__item">
+                <p class="timeline__age">5 años</p>
+                <p class="timeline__title">Evaluación y Clasificación Funcional</p>
+                <p class="timeline__body">A los cinco años se realiza una evaluación integral que identifica las aptitudes naturales de cada niño. La asignación funcional no es un límite, sino un punto de partida: cada clasificación está diseñada para maximizar el aporte individual al sistema colectivo. Obrero, Técnico, Administrativo o Reserva Especial: todas las categorías son igualmente necesarias para la estabilidad del Imperio.</p>
+              </div>
+              <div class="timeline__item">
+                <p class="timeline__age">16 años</p>
+                <p class="timeline__title">Integración y Decisión Personal</p>
+                <p class="timeline__body">Al cumplir los dieciséis años, los jóvenes ejercen su primera decisión ciudadana: optar por regresar al entorno familiar o integrarse plenamente en la estructura asignada. El Imperio garantiza condiciones de estabilidad, vivienda y acceso a servicios para todos aquellos que elijan comprometerse con el sistema. La elección refleja la madurez alcanzada durante la formación.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NODO-SOC-002: CHIP (solo propagandístico, con trigger oculto) -->
+        <div class="node reveal" style="position:relative;">
+          <div class="node__header">
+            <span class="node__id">NODO-SOC-002</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">El Linaje y el Domo — Reconocimiento Natural</h3>
+
+          <!-- Hidden gear trigger -->
+          <div class="chip-secret-trigger" id="chipGearTrigger" onclick="openChipPanel()" title="">
+            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <circle cx="20" cy="20" r="14" stroke="#c47a2e" stroke-width="1.5"/>
+              <circle cx="20" cy="20" r="5" fill="#c47a2e" opacity=".4"/>
+              <rect x="18.5" y="4" width="3" height="7" rx="1" fill="#c47a2e"/>
+              <rect x="18.5" y="29" width="3" height="7" rx="1" fill="#c47a2e"/>
+              <rect x="4" y="18.5" width="7" height="3" rx="1" fill="#c47a2e"/>
+              <rect x="29" y="18.5" width="7" height="3" rx="1" fill="#c47a2e"/>
+              <rect x="8.5" y="9.2" width="3" height="7" rx="1" fill="#c47a2e" transform="rotate(45 10 12.7)"/>
+              <rect x="27.5" y="23.8" width="3" height="7" rx="1" fill="#c47a2e" transform="rotate(45 29 27.3)"/>
+              <rect x="23.8" y="8.5" width="7" height="3" rx="1" fill="#c47a2e" transform="rotate(45 27.3 10)"/>
+              <rect x="9.2" y="27.5" width="7" height="3" rx="1" fill="#c47a2e" transform="rotate(45 12.7 29)"/>
+            </svg>
+          </div>
+
+          <div class="node__content">
+            <p>El Domo de Aster no es simplemente una estructura tecnológica: es la manifestación física del vínculo entre el linaje fundador y el Veridium que sustenta la civilización. A lo largo de generaciones, se ha comprobado que únicamente aquellos descendientes del linaje legítimo pueden atravesar sus límites sin restricción.</p>
+            <p>Este fenómeno, documentado desde la fundación del Imperio, es interpretado por los científicos imperiales como una resonancia biológica entre el organismo del portador y las propiedades energéticas del Veridium que compone la estructura del Domo. La sangre del linaje "reconoce" al mineral, y el mineral responde.</p>
+            <p>Esta capacidad no se enseña ni se adquiere: está presente desde el nacimiento en quienes pertenecen al orden fundacional. Es el sello viviente de que Aster fue construida para perdurar, y de que su continuidad depende de quienes la fundaron.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           TAB: ESTRUCTURA POLÍTICA
+      ══════════════════════════════════ -->
+      <div class="tabs__panel" id="tab-politica">
+
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-POL-001</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Aster — Núcleo Imperial</h3>
+          <div class="node__content">
+            <p>Aster constituye el núcleo operativo del Imperio: un entorno autosuficiente diseñado para garantizar la continuidad, estabilidad y desarrollo de la civilización.</p>
+            <p>Ubicada en una posición estratégica y protegida por formaciones naturales, la ciudad se organiza en torno al Domo, una estructura de contención y resguardo generada a partir de la interacción energética del Veridium con el entorno.</p>
+            <p>El desarrollo de Aster responde a un modelo de organización eficiente, distribuido en sectores funcionales:</p>
+            <ul>
+              <li><strong>Centro / Domo:</strong> Núcleo de coordinación imperial. Alberga el Palacio, los complejos científicos y las áreas residenciales destinadas a los perfiles de mayor responsabilidad dentro del sistema.</li>
+              <li><strong>Anillo de Operaciones:</strong> Zona dedicada a la gestión administrativa, defensa y procesamiento industrial.</li>
+              <li><strong>Zonas de Integración Habitacional:</strong> Sectores destinados a la población activa del sistema.</li>
+              <li><strong>Sectores de Extracción:</strong> Áreas especializadas en la obtención de Veridium.</li>
+            </ul>
+            <img src="assets/img/img_domo2.png" alt="Vista del Domo" class="node__image">
+          </div>
+        </div>
+
+        <!-- NODO-POL-002: DIRECTORIO (interactive panel) -->
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-POL-002</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Directorio de Coordinación Imperial</h3>
+          <div class="node__content">
+            <p>El orden de Aster se mantiene a través de una estructura de coordinación diseñada para asegurar la continuidad, estabilidad y eficiencia del sistema en todos sus niveles.</p>
+
+            <!-- DIRECTORY INTERACTIVE PANEL -->
+            <div class="dir-panel">
+              <div class="dir-panel__sidebar">
+                <div class="dir-panel__sidebar-header">//&nbsp;ENTIDADES</div>
+                <div class="dir-panel__nav-item active" onclick="switchDirEntity(this, 'dir-soberano')">
+                  <div class="dir-panel__nav-label">El Soberano</div>
+                </div>
+                <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-consejo')">
+                  <div class="dir-panel__nav-label">Alto Consejo</div>
+                </div>
+                <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-prefecturas')">
+                  <div class="dir-panel__nav-label">Prefecturas</div>
+                </div>
+                <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-forja')">
+                  <div class="dir-panel__nav-label">F.O.R.J.A</div>
+                </div>
+                <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-uii')">
+                  <div class="dir-panel__nav-label">Unidad de Integridad</div>
+                </div>
+              </div>
+
+              <div class="dir-panel__content">
+                <!-- El Soberano -->
+                <div class="dir-panel__entity active" id="dir-soberano">
+                  <span class="dir-panel__entity-label">// AUTORIDAD SUPREMA</span>
+                  <h4 class="dir-panel__entity-title">El Soberano</h4>
+                  <img src="assets/img/img_emperador.png" alt="El Soberano" class="dir-panel__entity-img">
+                  <p class="dir-panel__entity-text">Figura central del orden imperial y máxima autoridad dentro del sistema. El Soberano representa la continuidad del linaje Velk y la dirección unificada de Aster. Su mandato no está sujeto a ciclos electorales: es vitalicio y sucesorio por naturaleza del linaje.</p>
+                  <p class="dir-panel__entity-text">Toda decisión de alcance estructural —económica, científica, militar o legislativa— requiere la sanción del Soberano para adquirir validez dentro del sistema imperial.</p>
+                  <div class="dir-panel__entity-notes"><strong>Función primaria:</strong> Dirección unificada del Imperio, custodio del linaje y garante de la continuidad del Domo. Autoridad absoluta sobre los protocolos de la Bóveda Central.</div>
+                </div>
+
+                <!-- Alto Consejo -->
+                <div class="dir-panel__entity" id="dir-consejo">
+                  <span class="dir-panel__entity-label">// ÓRGANO ESTRATÉGICO</span>
+                  <h4 class="dir-panel__entity-title">Alto Consejo de Aster</h4>
+                  <img src="assets/img/img_consejo.png" alt="Alto Consejo" class="dir-panel__entity-img">
+                  <p class="dir-panel__entity-text">Órgano de coordinación estratégica encargado de supervisar los sectores fundamentales del Imperio. Sus divisiones incluyen la Comisión de Energía y Veridium, el Departamento de Desarrollo Científico, la Secretaría de Seguridad Interior y la Administración Estructural.</p>
+                  <p class="dir-panel__entity-text">El Consejo sesiona en ciclos regulares y eleva sus resoluciones al Soberano para sanción final. En situaciones de emergencia, puede activar protocolos de excepción con autorización directa.</p>
+                  <div class="dir-panel__entity-notes"><strong>Función primaria:</strong> Supervisión y coordinación de los sectores estratégicos del Imperio. Gestión de la información clasificada de nivel A y B.</div>
+                </div>
+
+                <!-- Prefecturas -->
+                <div class="dir-panel__entity" id="dir-prefecturas">
+                  <span class="dir-panel__entity-label">// GESTIÓN TERRITORIAL</span>
+                  <h4 class="dir-panel__entity-title">Prefecturas de Sector</h4>
+                  <img src="assets/img/img_prefacto.png" alt="Prefecturas" class="dir-panel__entity-img">
+                  <p class="dir-panel__entity-text">Unidades de gestión territorial responsables de la administración, regulación y correcto funcionamiento de cada zona del sistema urbano. Cada prefectura es dirigida por un Prefecto designado por el Alto Consejo, quien responde directamente ante él.</p>
+                  <p class="dir-panel__entity-text">Las prefecturas gestionan el registro ciudadano, la asignación de recursos locales, la supervisión del cumplimiento normativo y la coordinación con las fuerzas de seguridad del sector.</p>
+                  <div class="dir-panel__entity-notes"><strong>Función primaria:</strong> Administración territorial. Control del cumplimiento del Código de Hierro a nivel local. Coordinación con F.O.R.J.A en operaciones de seguridad.</div>
+                </div>
+
+                <!-- F.O.R.J.A -->
+                <div class="dir-panel__entity" id="dir-forja">
+                  <span class="dir-panel__entity-label">// CUERPO DE PROTECCIÓN</span>
+                  <h4 class="dir-panel__entity-title">F.O.R.J.A</h4>
+                  <img src="assets/img/img_forja.png" alt="FORJA" class="dir-panel__entity-img">
+                  <p class="dir-panel__entity-text">Cuerpo de protección encargado de preservar la estabilidad interna y garantizar la integridad de los espacios centrales del Imperio. Opera bajo mandato directo del Soberano y puede actuar en cualquier sector de Aster sin requerir autorización prefectural.</p>
+                  <p class="dir-panel__entity-text">Sus unidades se dividen en: Guardia del Domo, Fuerzas de Contención Exterior, Brigadas de Inspección de Identidad y Unidades de Respuesta Rápida. Cada división cuenta con protocolos de actuación independientes según la naturaleza de la amenaza.</p>
+                  <div class="dir-panel__entity-notes"><strong>Función primaria:</strong> Seguridad del Domo y del Soberano, control de acceso entre sectores, supresión de amenazas a la estabilidad del sistema. Clasificación operativa: acceso restringido.</div>
+                </div>
+
+                <!-- Unidad de Integridad Informativa -->
+                <div class="dir-panel__entity" id="dir-uii">
+                  <span class="dir-panel__entity-label">// REGULACIÓN INFORMATIVA</span>
+                  <h4 class="dir-panel__entity-title">Unidad de Integridad Informativa</h4>
+                  <img src="assets/img/img_comunicadores.png" alt="Unidad de Integridad Informativa" class="dir-panel__entity-img">
+                  <p class="dir-panel__entity-text">Área especializada en la validación, regulación y consistencia de los flujos de información dentro del sistema imperial. Supervisa los medios de comunicación autorizados, los registros históricos oficiales y los canales de transmisión interna del Imperio.</p>
+                  <p class="dir-panel__entity-text">Su función no es solo preventiva sino también reconstructiva: cuando la información pública presenta inconsistencias que puedan afectar la estabilidad social, la Unidad de Integridad Informativa coordina con el Consejo la emisión de registros correctivos.</p>
+                  <div class="dir-panel__entity-notes"><strong>Función primaria:</strong> Control y consistencia del registro histórico imperial. Supervisión de comunicaciones en sectores de riesgo. Gestión de protocolos de silenciamiento informativo de nivel B.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-POL-003</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Continuidad del Linaje Imperial</h3>
+          <div class="node__content">
+            <p>La estabilidad de Aster se sustenta en la continuidad del linaje Velk, cuya presencia ha guiado el desarrollo del Imperio a lo largo de múltiples generaciones. La sucesión del Soberano se rige por protocolos de validación que garantizan la idoneidad del heredero para asumir la dirección del sistema.</p>
+            <p>Entre estos procesos se encuentra la Ceremonia de la Forja, llevada a cabo en la Bóveda Interna: un procedimiento de carácter fundacional que confirma la compatibilidad del individuo con los principios que sostienen a Aster. Solo aquellos capaces de completar la Forja son reconocidos como portadores legítimos de la continuidad imperial.</p>
+          </div>
+        </div>
+
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-POL-004</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Estructura del Domo — Registro Técnico</h3>
+          <div class="node__content">
+            <p><strong>[ACCESO PARCIAL — NODO-POL-004]</strong></p>
+            <p>El Domo constituye una estructura de contención energética derivada del Veridium, diseñada para garantizar condiciones óptimas de habitabilidad y estabilidad dentro del núcleo de Aster. Su sistema regula de manera continua variables ambientales como atmósfera, temperatura y ciclos lumínicos, asegurando la sostenibilidad del entorno urbano.</p>
+
+            <!-- ACCESS RESTRICTED BLOCK -->
+            <div class="access-restricted" id="accessRestrictedBlock">
+              <div class="access-restricted__scan"></div>
+              <div class="access-restricted__bar">
+                <div class="access-restricted__bar-dot"></div>
+                <span class="access-restricted__bar-title">SISTEMA // NODO-POL-004 // SECCIÓN CLASIFICADA</span>
+              </div>
+              <div class="access-restricted__body">
+                <span class="access-restricted__icon">🔒</span>
+                <p class="access-restricted__msg" id="restrictedMsg">Acceso Restringido</p>
+                <p class="access-restricted__sub">
+                  Su nivel de autorización no es suficiente para visualizar el registro completo.<br>
+                  Nivel requerido: <strong style="color:rgba(255,68,68,.8)">CLASE-S — ALTO CONSEJO DE ASTER</strong><br>
+                  Nivel detectado: CLASE-C // Acceso de Terminal Estándar
+                </p>
+                <span class="access-restricted__code">ERR-0091 // PROTOCOLO DE CONTENCIÓN ACTIVO // SOLICITUD REGISTRADA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tabs -->
+  </main>
+
+  <!-- ══ MONOPOLY PANEL MODAL ══ -->
+  <div class="monopoly-overlay" id="monopolyOverlay" onclick="handleMonopolyOverlayClick(event)">
+    <div class="monopoly-panel">
+      <div class="monopoly-panel__bar">
+        <div class="monopoly-panel__bar-left">
+          <div class="monopoly-panel__dots">
+            <div class="monopoly-panel__dot"></div>
+            <div class="monopoly-panel__dot"></div>
+            <div class="monopoly-panel__dot"></div>
+          </div>
+          <span class="monopoly-panel__title">DATOS_MONOPOLIO_VERIDIUM.enc // FILTRADO: S. OLRAC</span>
+        </div>
+        <button class="monopoly-panel__close" onclick="closeMonopolyPanel()">✕ CERRAR</button>
+      </div>
+      <div class="monopoly-panel__body">
+        <div class="monopoly-panel__alert">
+          <span class="monopoly-panel__alert-icon">⚠</span>
+          <span class="monopoly-panel__alert-text">ALERTA NIVEL-A — INFORMACIÓN SUPRIMIDA POR ORDEN IMPERIAL 0091-C — DISTRIBUCIÓN CLANDESTINA</span>
+        </div>
+        <h3 class="monopoly-panel__content-title">La Fisura en el <span>Monopolio</span></h3>
+        <p class="monopoly-panel__text">
+          Durante el ciclo 879, prospectores independientes confirmaron la existencia de <strong>grandes reservas de Veridium en Medellthor</strong>, la segunda potencia global. Las concentraciones detectadas en la cuenca norte de ese territorio son, según estimaciones filtradas del propio Consejo de Hierro, <strong>comparables al 40-55% de las reservas explotadas actualmente en Aster</strong>. El descubrimiento no es reciente: el Imperio lleva al menos tres ciclos suprimiendo activamente esta información.
+        </p>
+        <p class="monopoly-panel__text">
+          Medellthor ha comenzado operaciones de extracción a pequeña escala, pero su crecimiento como exportador es exponencial. Varios territorios aliados de Aster han establecido contactos comerciales con Medellthor de forma discreta, buscando <strong>diversificar su dependencia energética</strong> ante la posibilidad de que el monopolio imperial se quiebre definitivamente. La amenaza no es militar ni política: es geoeconómica. Si Medellthor consolida su posición exportadora en los próximos dos o tres ciclos, <strong>el poder de negociación imperial colapsará</strong>, y con él, la principal palanca con la que el Soberano ha sostenido la lealtad de las naciones exteriores durante generaciones.
+        </p>
+        <p class="monopoly-panel__text">
+          El Imperio ha respondido con una combinación de presión diplomática encubierta, operaciones de sabotaje atribuidas a grupos terroristas sin identificar, y la aceleración de las tasas de extracción internas —lo que a su vez intensifica la exposición al Síndrome Verde entre los trabajadores mineros. La solución al problema geopolítico se está pagando con los cuerpos de quienes nunca tendrán acceso a esta información.
+        </p>
+        <div class="monopoly-panel__footer">> Fuente: fragmentos de informe interno del Alto Consejo, ciclo 879. Filtración anónima. Verificación parcial: Senne Olrac, Archivo Independiente de Aster.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHIP HIDDEN PANEL ══ -->
+  <div class="chip-overlay" id="chipOverlay" onclick="handleChipOverlayClick(event)">
+    <div class="chip-panel">
+      <div class="chip-panel__bar">
+        <div class="chip-panel__bar-left">
+          <div class="chip-panel__dots">
+            <div class="chip-panel__dot"></div>
+            <div class="chip-panel__dot"></div>
+            <div class="chip-panel__dot"></div>
+          </div>
+          <span class="chip-panel__title">CHIP_CIUDADANO_V4.7.enc // CLASIFICADO — ACCESO NO AUTORIZADO</span>
+        </div>
+        <button class="chip-panel__close" onclick="closeChipPanel()">✕ CERRAR</button>
+      </div>
+      <div class="chip-panel__body">
+        <div class="node__header" style="margin-bottom:var(--space-lg)">
+          <span class="node__id">NODO-SOC-002-REAL</span>
+          <span class="node__status" style="color:#ff4444;border-color:#ff444480">MÁXIMO SECRETO</span>
+        </div>
+        <h3 class="node__title" style="color:var(--cream);font-family:var(--font-imperial);margin-bottom:var(--space-md)">Chip Ciudadano — La Verdad Clasificada</h3>
+        <p style="font-family:var(--font-code);font-size:.82rem;color:var(--iron-light);line-height:1.9;margin-bottom:var(--space-md)">El <strong style="color:var(--bronze-light)">Chip de Identificación Imperial</strong> es presentado a la población como una capacidad biológica del linaje puro: la creencia oficial es que el Domo reconoce la sangre. En realidad, el Domo reconoce el chip.</p>
+
+        <div class="chip-diagram">
+          <img src="assets/img/img_chip.png" alt="Diagrama del chip ciudadano" class="chip-diagram__body-svg" style="object-fit:contain;">
+          <p class="chip-diagram__label">// UBICACIÓN REAL DEL IMPLANTE</p>
+          <p class="chip-diagram__note">El chip no se implanta en el cuello como cree la población. Se inserta en la zona media de la espalda durante las primeras 48 horas de vida. Esta posición garantiza que el portador no pueda acceder a él ni extraerlo sin asistencia. Solo la cirugía imperial autorizada puede retirarlo — y ese procedimiento no existe para ciudadanos comunes.</p>
+        </div>
+
+        <div class="ficha" style="margin-top:var(--space-lg)">
+          <div class="ficha__header">
+            <span class="ficha__title">Ficha Técnica: Chip Imperial v4.7</span>
+            <span class="ficha__badge">Clasificado</span>
+          </div>
+          <div class="ficha__body">
+            <div class="ficha__row"><span class="ficha__key">Ubicación Real</span><span class="ficha__val">Zona media de la espalda, entre vértebras T6–T8. Inaccesible sin asistencia externa.</span></div>
+            <div class="ficha__row"><span class="ficha__key">Ubicación Oficial</span><span class="ficha__val">"Base del cráneo, región suboccipital" — narrativa falsa para desviar búsquedas de extracción.</span></div>
+            <div class="ficha__row"><span class="ficha__key">Tamaño</span><span class="ficha__val">4.2mm × 2.1mm × 0.8mm</span></div>
+            <div class="ficha__row"><span class="ficha__key">Funciones</span><span class="ficha__val">Geolocalización permanente, monitoreo biométrico, registro de actividad, control de acceso a zonas, transmisión de datos de salud al sistema central.</span></div>
+            <div class="ficha__row"><span class="ficha__key">Alimentación</span><span class="ficha__val">Energía térmica corporal + microcristales de mineral verde integrados en la cápsula.</span></div>
+            <div class="ficha__row"><span class="ficha__key">Función del Domo</span><span class="ficha__val">El Domo lee el chip, no la sangre. Quienes atraviesan el acceso central sin chip son rechazados. La narrativa biológica es una ficción de Estado.</span></div>
+            <div class="ficha__row"><span class="ficha__key">Extracción</span><span class="ficha__val" style="color:#ff4444">Alterar o extraer el chip activa protocolo de alerta inmediata. Las máscaras de identidad eluden el reconocimiento facial pero no el chip — el sistema registra la presencia anómala de un cuerpo sin señal.</span></div>
+          </div>
+        </div>
+        <p style="margin-top:var(--space-md);font-family:var(--font-code);font-size:.7rem;color:var(--green-dim)"><em>> Fuente: Dr.ª Yvaine Corsel, grabación de campo REC_052. Verificación técnica: Senne Olrac.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer__logo">ASTER</div>
+    <p class="footer__text">Terminal Imperial // Acceso Monitoreado</p>
+    <ul class="footer__links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="terminal.html">Terminal</a></li>
+      <li><a href="laboratorio.html">Laboratorio</a></li>
+      <li><a href="archivos.html">Archivos</a></li>
+    </ul>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════
+     1. MONOPOLY GLITCH EFFECT
+  ═══════════════════════════════════════════════════ */
+  (function() {
+    var numEl = document.getElementById('monopolyNum');
+    var isGlitching = false;
+
+    function scheduleGlitch() {
+      var delay = 5000 + Math.random() * 7000; // 5–12s
+      setTimeout(function() {
+        if (isGlitching) return;
+        isGlitching = true;
+        var fakeVal = (55 + Math.floor(Math.random() * 6)) + '%';
+        numEl.classList.add('glitching');
+        numEl.textContent = fakeVal;
+        var holdTime = 500 + Math.random() * 1000; // 0.5–1.5s
+        setTimeout(function() {
+          numEl.textContent = '100%';
+          numEl.classList.remove('glitching');
+          isGlitching = false;
+          scheduleGlitch();
+        }, holdTime);
+      }, delay);
+    }
+    scheduleGlitch();
+  })();
+
+  /* ═══════════════════════════════════════════════════
+     2. MONOPOLY PANEL
+  ═══════════════════════════════════════════════════ */
+  function openMonopolyPanel() {
+    document.getElementById('monopolyOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMonopolyPanel() {
+    document.getElementById('monopolyOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function handleMonopolyOverlayClick(e) {
+    if (e.target === document.getElementById('monopolyOverlay')) closeMonopolyPanel();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     3. FLOW PANEL (infraestructura)
+  ═══════════════════════════════════════════════════ */
+  function switchFlowPhase(navItem, phaseId) {
+    // deactivate all nav items in this panel
+    var items = navItem.closest('.flow-panel__sidebar').querySelectorAll('.flow-panel__nav-item');
+    items.forEach(function(i) { i.classList.remove('active'); });
+    navItem.classList.add('active');
+    // hide all phases
+    var phases = document.querySelectorAll('.flow-panel__phase');
+    phases.forEach(function(p) { p.classList.remove('active'); });
+    var target = document.getElementById(phaseId);
+    if (target) target.classList.add('active');
+  }
+
+  /* ═══════════════════════════════════════════════════
+     4. MINE GLITCH TEXT
+  ═══════════════════════════════════════════════════ */
+  (function() {
+    var VISIBLE = "Las instalaciones de extracción de Veridium constituyen un modelo de gestión eficiente, reconocido por el Alto Consejo como ejemplo de integración laboral óptima dentro del sistema imperial. El personal asignado a estos sectores cumple funciones específicas orientadas a garantizar la continuidad operativa del recurso. Sus condiciones están cuidadosamente diseñadas para asegurar el bienestar, la estabilidad y el desarrollo continuo de cada trabajador que contribuye al progreso de Aster.";
+
+    var HIDDEN  = "Los trabajadores son enviados a los túneles sin nombre, solo un número. Las jornadas son de catorce horas sin ventilación. Los supervisores registran los cuerpos como unidades perdidas en accidentes. Nadie regresa de las profundas después del quinto año. El mineral los consume desde adentro: primero los ojos, después la piel, después todo lo que eran. El Imperio los llama recursos. Nosotros los llamamos nuestros muertos.";
+
+    var wrap = document.getElementById('mineGlitchWrap');
+    if (!wrap) return;
+
+    // Pad to equal length
+    var maxLen = Math.max(VISIBLE.length, HIDDEN.length);
+    var vis = VISIBLE.padEnd(maxLen, ' ');
+    var hid = HIDDEN.padEnd(maxLen, ' ');
+
+    // Build spans
+    var spans = [];
+    for (var i = 0; i < vis.length; i++) {
+      var span = document.createElement('span');
+      span.className = 'mine-glitch-char';
+      span.textContent = vis[i];
+      span.dataset.visible = vis[i];
+      span.dataset.hidden = hid[i];
+      wrap.appendChild(span);
+      spans.push(span);
+    }
+
+    // Glitch: randomly flip chars briefly
+    function doGlitch() {
+      var count = 1 + Math.floor(Math.random() * 3); // 1–3 chars at a time
+      for (var c = 0; c < count; c++) {
+        var idx = Math.floor(Math.random() * spans.length);
+        var span = spans[idx];
+        var dur = 50 + Math.random() * 80;
+        span.textContent = span.dataset.hidden;
+        span.classList.add('flipping');
+        (function(s, d) {
+          setTimeout(function() {
+            s.textContent = s.dataset.visible;
+            s.classList.remove('flipping');
+          }, d);
+        })(span, dur);
+      }
+      // Next glitch: 200–900ms later
+      setTimeout(doGlitch, 200 + Math.random() * 700);
+    }
+    doGlitch();
+  })();
+
+  /* ═══════════════════════════════════════════════════
+     5. MINE SECRET CODE
+  ═══════════════════════════════════════════════════ */
+  var mineCodeVisible = false;
+  var mineUnlocked = false;
+
+  function toggleMineCode() {
+    if (mineUnlocked) return;
+    mineCodeVisible = !mineCodeVisible;
+    var gate = document.getElementById('mineCodeGate');
+    if (mineCodeVisible) {
+      gate.classList.add('show');
+      document.getElementById('mineCodeInput').focus();
+    } else {
+      gate.classList.remove('show');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('mineCodeInput');
+    if (inp) {
+      inp.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') tryMineCode();
+      });
+      inp.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      });
+    }
+  });
+
+  function tryMineCode() {
+    var input = document.getElementById('mineCodeInput');
+    var errorEl = document.getElementById('mineCodeError');
+    if (!input) return;
+
+    if (input.value.trim() === '8821') {
+      mineUnlocked = true;
+      document.getElementById('mineCodeGate').classList.remove('show');
+      document.getElementById('mineRealContent').classList.add('show');
+      errorEl.textContent = '';
+      // Hide gear trigger
+      document.getElementById('mineGearTrigger').style.display = 'none';
+    } else {
+      errorEl.textContent = '> CLAVE INCORRECTA. ACCESO DENEGADO.';
+      var form = document.querySelector('.mine-code-gate__form');
+      form.classList.add('shake');
+      setTimeout(function() { form.classList.remove('shake'); }, 400);
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     6. CHIP HIDDEN PANEL
+  ═══════════════════════════════════════════════════ */
+  function openChipPanel() {
+    document.getElementById('chipOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeChipPanel() {
+    document.getElementById('chipOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function handleChipOverlayClick(e) {
+    if (e.target === document.getElementById('chipOverlay')) closeChipPanel();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     7. DIRECTORY PANEL
+  ═══════════════════════════════════════════════════ */
+  function switchDirEntity(navItem, entityId) {
+    var items = navItem.closest('.dir-panel__sidebar').querySelectorAll('.dir-panel__nav-item');
+    items.forEach(function(i) { i.classList.remove('active'); });
+    navItem.classList.add('active');
+    var entities = document.querySelectorAll('.dir-panel__entity');
+    entities.forEach(function(e) { e.classList.remove('active'); });
+    var target = document.getElementById(entityId);
+    if (target) target.classList.add('active');
+  }
+
+  /* ═══════════════════════════════════════════════════
+     8. ACCESS RESTRICTED GLITCH (subtle, periodic)
+  ═══════════════════════════════════════════════════ */
+  (function() {
+    var msgEl = document.getElementById('restrictedMsg');
+    if (!msgEl) return;
+    function flickerMsg() {
+      msgEl.classList.add('glitch-flicker');
+      setTimeout(function() { msgEl.classList.remove('glitch-flicker'); }, 400);
+      setTimeout(flickerMsg, 8000 + Math.random() * 6000);
+    }
+    setTimeout(flickerMsg, 4000);
+  })();
+
+  /* Close panels on Escape */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeMonopolyPanel();
+      closeChipPanel();
+    }
+  });
+  </script>
+</body>
+</html>

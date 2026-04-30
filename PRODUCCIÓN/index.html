@@ -1,0 +1,1279 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ASTER - Universo Transmedia. La Memoria es un Arma. Descubre el domo, la resistencia y los secretos de una ciudad bajo control imperial.">
+  <title>ASTER | Trabaja. Obedece. Prospera.</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ══════════════════════════════════════════
+       VIDEO PANEL — estilo base de datos
+    ══════════════════════════════════════════ */
+    .video-panel {
+      position: relative;
+      background: rgba(0,5,0,.92);
+      border: 1px solid rgba(57,255,20,.25);
+      border-top: 3px solid var(--green-neon);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+    }
+    .video-panel::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+      animation: vpScan 5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes vpScan {
+      0%   { top: 0; opacity: .7; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .video-panel__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(57,255,20,.06);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+    }
+    .video-panel__bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .video-panel__dots {
+      display: flex;
+      gap: 5px;
+    }
+    .video-panel__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .video-panel__dot:nth-child(1) { background: #ff4444; box-shadow: 0 0 4px #ff4444; }
+    .video-panel__dot:nth-child(2) { background: var(--brass); box-shadow: 0 0 4px var(--brass); }
+    .video-panel__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .video-panel__title {
+      font-family: var(--font-code);
+      font-size: .67rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .video-panel__badge {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,.4);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+      animation: statusBlink 2s infinite;
+    }
+    @keyframes statusBlink {
+      0%,100%{opacity:1} 50%{opacity:.4}
+    }
+    .video-panel__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid rgba(57,255,20,.08);
+      background: rgba(57,255,20,.02);
+    }
+    .video-panel__meta-item {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .video-panel__meta-item strong {
+      color: var(--brass);
+      margin-right: 4px;
+    }
+    .video-panel__body {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-top: 56.25%;
+      overflow: hidden;
+    }
+    .video-panel__body iframe {
+      position: absolute;
+      width: 100%; height: 100%;
+      top: 0; left: 0;
+      border: none; padding: 0; margin: 0;
+    }
+    .video-panel__footer {
+      padding: var(--space-sm) var(--space-lg);
+      border-top: 1px solid rgba(57,255,20,.08);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      background: rgba(0,5,0,.6);
+    }
+    .video-panel__footer-text {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .video-panel__footer-text::before {
+      content: '> ';
+      color: var(--green-neon);
+    }
+
+    /* ══════════════════════════════════════════
+       PANEL BENEFICIOS — repositorio navegable
+    ══════════════════════════════════════════ */
+    .benefits-repo {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      background: rgba(0,5,0,.92);
+      border: 1px solid rgba(57,255,20,.25);
+      border-top: 3px solid var(--green-neon);
+      margin: var(--space-xl) 0;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    @media(max-width: 700px) {
+      .benefits-repo { grid-template-columns: 1fr; }
+    }
+
+    /* Sidebar nav */
+    .benefits-repo__nav {
+      border-right: 1px solid rgba(57,255,20,.15);
+      background: rgba(57,255,20,.03);
+      display: flex;
+      flex-direction: column;
+    }
+    .benefits-repo__nav-header {
+      padding: var(--space-md) var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.15);
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(57,255,20,.05);
+    }
+    .benefits-repo__nav-header::before { content: '> '; }
+    .benefits-repo__nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: var(--space-md) var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.06);
+      cursor: pointer;
+      transition: all .25s;
+      position: relative;
+    }
+    .benefits-repo__nav-item:hover {
+      background: rgba(57,255,20,.06);
+    }
+    .benefits-repo__nav-item.active {
+      background: rgba(57,255,20,.1);
+      border-left: 2px solid var(--green-neon);
+    }
+    .benefits-repo__nav-item.active::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 6px solid rgba(0,5,0,.92);
+    }
+    .benefits-repo__nav-num {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-dim);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .benefits-repo__nav-label {
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--iron-light);
+      line-height: 1.4;
+      letter-spacing: .5px;
+    }
+    .benefits-repo__nav-item.active .benefits-repo__nav-label {
+      color: var(--green-neon);
+    }
+
+    /* Content area */
+    .benefits-repo__content {
+      display: flex;
+      flex-direction: column;
+    }
+    .benefits-repo__content-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(57,255,20,.04);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .benefits-repo__content-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .benefits-repo__dots {
+      display: flex;
+      gap: 5px;
+    }
+    .benefits-repo__dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+    }
+    .benefits-repo__dot:nth-child(1) { background: #ff4444; }
+    .benefits-repo__dot:nth-child(2) { background: var(--brass); }
+    .benefits-repo__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .benefits-repo__path {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .benefits-repo__status {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-neon);
+      border: 1px solid var(--green-dim);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+
+    /* Panels */
+    .benefits-repo__panel {
+      display: none;
+      flex: 1;
+      padding: var(--space-lg) var(--space-xl);
+      animation: panelFadeIn .3s ease;
+    }
+    .benefits-repo__panel.active { display: flex; flex-direction: column; gap: var(--space-md); }
+    @keyframes panelFadeIn {
+      from { opacity:0; transform: translateX(8px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+
+    .benefits-repo__entry-id {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      margin-bottom: var(--space-xs);
+    }
+    .benefits-repo__entry-title {
+      font-family: var(--font-imperial);
+      font-size: 1.2rem;
+      color: var(--cream);
+      margin-bottom: var(--space-sm);
+    }
+    .benefits-repo__entry-body {
+      font-family: var(--font-code);
+      font-size: .83rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+      border-left: 2px solid rgba(57,255,20,.2);
+      padding-left: var(--space-md);
+    }
+    .benefits-repo__img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/7;
+      background: rgba(57,255,20,.03);
+      border: 1px dashed rgba(57,255,20,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: var(--space-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .benefits-repo__img-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .benefits-repo__img-placeholder-label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      text-align: center;
+    }
+    .benefits-repo__img-placeholder-label::before {
+      content: '[ ';
+    }
+    .benefits-repo__img-placeholder-label::after {
+      content: ' ]';
+    }
+    .benefits-repo__footer {
+      border-top: 1px dashed rgba(57,255,20,.12);
+      padding: var(--space-md) var(--space-xl);
+      font-family: var(--font-code);
+      font-size: .68rem;
+      color: var(--iron-gray);
+      line-height: 1.7;
+      background: rgba(57,255,20,.02);
+    }
+    .benefits-repo__footer::before {
+      content: '// AVISO: ';
+      color: var(--brass);
+    }
+
+    /* ══════════════════════════════════════════
+       ECO-ITEMS — estilo expediente/registro
+    ══════════════════════════════════════════ */
+    .eco-item {
+      padding: 0 !important;
+      background: rgba(0,5,0,.85) !important;
+      border: 1px solid rgba(57,255,20,.18) !important;
+      border-top: 2px solid var(--bronze) !important;
+      text-align: left !important;
+      transition: all .3s !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+    .eco-item:hover {
+      border-color: var(--green-neon) !important;
+      border-top-color: var(--green-neon) !important;
+      background: rgba(57,255,20,.04) !important;
+      transform: translateY(-3px) !important;
+      box-shadow: 0 0 20px rgba(57,255,20,.07) !important;
+    }
+    .eco-item__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.08);
+      background: rgba(57,255,20,.04);
+    }
+    .eco-item__id {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .eco-item__status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-neon);
+      box-shadow: 0 0 5px var(--green-neon);
+    }
+    .eco-item__body {
+      padding: var(--space-md) var(--space-md) var(--space-lg);
+    }
+    .eco-item__icon {
+      font-size: 1.4rem !important;
+      display: block !important;
+      margin-bottom: var(--space-sm) !important;
+      filter: drop-shadow(0 0 6px rgba(218,165,32,.5));
+    }
+    .eco-item__label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--brass);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .eco-item__title {
+      font-family: var(--font-imperial) !important;
+      font-size: 1.05rem !important;
+      color: var(--cream) !important;
+      margin-bottom: var(--space-xs) !important;
+    }
+    .eco-item__text {
+      font-size: .78rem !important;
+      color: var(--iron-light) !important;
+      line-height: 1.6 !important;
+      border-left: 1px solid rgba(57,255,20,.15);
+      padding-left: var(--space-sm);
+    }
+    .eco-item__scan {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .eco-item:hover .eco-item__scan { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       SECCIÓN ACCESO — SISTEMA REPOSITORIO
+    ══════════════════════════════════════════ */
+    #acceso {
+      text-align: left !important;
+    }
+    .repo-system {
+      border: 1px solid rgba(57,255,20,.2);
+      border-top: 3px solid var(--bronze);
+      background: rgba(0,3,0,.95);
+      overflow: hidden;
+    }
+    .repo-system__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px var(--space-lg);
+      background: rgba(57,255,20,.04);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .repo-system__bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .repo-system__dots { display: flex; gap: 5px; }
+    .repo-system__dot { width: 8px; height: 8px; border-radius: 50%; }
+    .repo-system__dot:nth-child(1) { background: #ff4444; }
+    .repo-system__dot:nth-child(2) { background: var(--brass); }
+    .repo-system__dot:nth-child(3) { background: var(--green-neon); box-shadow: 0 0 4px var(--green-neon); }
+    .repo-system__title {
+      font-family: var(--font-code);
+      font-size: .65rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .repo-system__body {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 500px;
+    }
+    @media(max-width: 800px) {
+      .repo-system__body { grid-template-columns: 1fr; }
+    }
+
+    /* Left file tree */
+    .repo-tree {
+      border-right: 1px solid rgba(57,255,20,.12);
+      background: rgba(57,255,20,.02);
+      display: flex;
+      flex-direction: column;
+    }
+    .repo-tree__header {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+      background: rgba(57,255,20,.04);
+    }
+    .repo-tree__group {
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid rgba(57,255,20,.06);
+    }
+    .repo-tree__group-label {
+      padding: 4px var(--space-md);
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--brass);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .repo-tree__file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px var(--space-md) 7px calc(var(--space-md) + 12px);
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--iron-light);
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      position: relative;
+      border-left: 2px solid transparent;
+    }
+    .repo-tree__file:hover {
+      background: rgba(57,255,20,.06);
+      color: var(--green-neon);
+    }
+    .repo-tree__file.active {
+      background: rgba(57,255,20,.1);
+      color: var(--green-neon);
+      border-left-color: var(--green-neon);
+    }
+    .repo-tree__file-icon {
+      font-size: .75rem;
+      flex-shrink: 0;
+      opacity: .7;
+    }
+    .repo-tree__file-name { flex: 1; }
+    .repo-tree__file-badge {
+      font-size: .52rem;
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,.35);
+      padding: 1px 5px;
+      letter-spacing: 1px;
+    }
+    .repo-tree__file-badge--ok {
+      color: var(--green-neon);
+      border-color: rgba(57,255,20,.3);
+    }
+
+    /* Right content panel */
+    .repo-viewer {
+      display: flex;
+      flex-direction: column;
+    }
+    .repo-viewer__breadcrumb {
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid rgba(57,255,20,.08);
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+      background: rgba(57,255,20,.02);
+    }
+    .repo-viewer__breadcrumb span { color: var(--green-neon); }
+
+    /* Individual record panels */
+    .repo-record {
+      display: none;
+      flex: 1;
+      padding: var(--space-lg) var(--space-xl);
+      animation: recFadeIn .3s ease;
+    }
+    .repo-record.active { display: block; }
+    @keyframes recFadeIn {
+      from { opacity:0; transform: translateY(6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* Nucleus (obra núcleo) */
+    .repo-nucleus {
+      background: linear-gradient(135deg, rgba(26,20,10,.9), rgba(10,8,3,.95));
+      border: 1px solid var(--brass);
+      border-left: 4px solid var(--bronze);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    .repo-nucleus::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 180px; height: 180px;
+      background: radial-gradient(ellipse, rgba(218,165,32,.07), transparent 70%);
+      pointer-events: none;
+    }
+    .repo-nucleus__label {
+      font-family: var(--font-code);
+      font-size: .6rem;
+      color: var(--bronze-light);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .repo-nucleus__label::before { content: '★'; font-size: .8rem; }
+    .repo-nucleus__title {
+      font-family: var(--font-imperial);
+      font-size: 1.5rem;
+      color: var(--cream);
+      margin-bottom: var(--space-sm);
+    }
+    .repo-nucleus__desc {
+      font-family: var(--font-code);
+      font-size: .8rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+      margin-bottom: var(--space-lg);
+    }
+    .repo-nucleus__link-placeholder {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-code);
+      font-size: .75rem;
+      color: var(--brass);
+      border: 1px solid var(--brass);
+      padding: var(--space-sm) var(--space-lg);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      text-decoration: none;
+    }
+    .repo-nucleus__link-placeholder:hover {
+      background: var(--brass);
+      color: var(--bg-darker);
+      box-shadow: var(--shadow-brass);
+    }
+    .repo-nucleus__link-placeholder::before { content: '▶'; }
+
+    /* DB record rows */
+    .repo-record__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .repo-record__id {
+      font-family: var(--font-code);
+      font-size: .62rem;
+      color: var(--green-dim);
+      letter-spacing: 2px;
+    }
+    .repo-record__badge {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-neon);
+      border: 1px solid var(--green-dim);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+    .repo-record__title {
+      font-family: var(--font-imperial);
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: var(--space-sm);
+    }
+    .repo-record__desc {
+      font-family: var(--font-code);
+      font-size: .8rem;
+      color: var(--iron-light);
+      line-height: 1.8;
+      margin-bottom: var(--space-md);
+      padding-left: var(--space-md);
+      border-left: 2px solid rgba(57,255,20,.2);
+    }
+    .repo-record__link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--green-neon);
+      border: 1px solid rgba(57,255,20,.4);
+      padding: var(--space-sm) var(--space-md);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all .3s;
+    }
+    .repo-record__link:hover {
+      background: var(--green-neon);
+      color: var(--bg-darker);
+      box-shadow: var(--shadow-neon);
+    }
+    .repo-record__link::before { content: '→'; }
+    .repo-record__preview {
+      margin-top: var(--space-md);
+      width: 100%;
+      aspect-ratio: 16/6;
+      overflow: hidden;
+      border: 1px solid rgba(57,255,20,.12);
+      filter: saturate(.6) contrast(1.1);
+      transition: filter .3s;
+    }
+    .repo-record__preview:hover { filter: saturate(.9) contrast(1.2); }
+    .repo-record__preview img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    .repo-system__statusbar {
+      padding: 6px var(--space-lg);
+      border-top: 1px solid rgba(57,255,20,.08);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+      background: rgba(57,255,20,.02);
+    }
+    .repo-system__statusbar-item {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+    }
+    .repo-system__statusbar-item strong {
+      color: var(--green-neon);
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <span class="loader__text">INICIALIZANDO SISTEMA...</span>
+    <div class="loader__bar"><div class="loader__progress"></div></div>
+  </div>
+
+  <!-- PARTICLES -->
+  <div class="particles" id="particles"></div>
+
+  <!-- GEARS -->
+  <div class="gear-container">
+    <div class="gear">
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+    </div>
+    <div class="gear gear--small">
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+      <div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div><div class="gear__tooth"></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav__logo">ASTER</a>
+    <div class="nav__hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="index.html" class="nav__link active">Inicio</a></li>
+      <li><a href="terminal.html" class="nav__link">Terminal</a></li>
+      <li><a href="laboratorio.html" class="nav__link">Laboratorio</a></li>
+      <li><a href="archivos.html" class="nav__link">Archivos</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <h1 class="hero__title glitch" data-text="ASTER">ASTER</h1>
+      <div class="hero__divider"></div>
+      <p class="hero__subtitle">Trabaja. Obedece. Prospera.</p>
+      <a href="terminal.html" class="btn btn--primary">Acceder al Sistema &rarr;</a>
+    </div>
+    <div class="hero__scroll">
+      <span>Descender</span>
+      <div class="hero__scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ECOSISTEMA -->
+  <section class="section reveal" id="ecosistema">
+    <div class="section__header">
+      <span class="section__label">// Archivo Clasificado</span>
+
+      <!-- ══ 1. VIDEO PANEL ══ -->
+      <div class="video-panel">
+        <div class="video-panel__bar">
+          <div class="video-panel__bar-left">
+            <div class="video-panel__dots">
+              <div class="video-panel__dot"></div>
+              <div class="video-panel__dot"></div>
+              <div class="video-panel__dot"></div>
+            </div>
+            <span class="video-panel__title">ARCHIVO_VISUAL_IMP-001.enc // EMISION AUTORIZADA</span>
+          </div>
+          <span class="video-panel__badge">TRANSMISIÓN ACTIVA</span>
+        </div>
+        <div class="video-panel__meta">
+          <span class="video-panel__meta-item"><strong>ID:</strong> AV-0091-C</span>
+          <span class="video-panel__meta-item"><strong>Clasificación:</strong> Uso Interno — Distribución Controlada</span>
+          <span class="video-panel__meta-item"><strong>Ciclo:</strong> 8821</span>
+          <span class="video-panel__meta-item"><strong>Origen:</strong>Alto Consejo de Aster</span>
+        </div>
+        <div class="video-panel__body">
+          <iframe loading="lazy"
+            src="https://www.canva.com/design/DAHITRaTXrk/ubo41KGu9RKOAKebI3n1gQ/watch?embed"
+            allowfullscreen="allowfullscreen" allow="fullscreen">
+          </iframe>
+        </div>
+        <div class="video-panel__footer">
+          <span class="video-panel__footer-text">Archivo visual de uso oficial. Reproducción no autorizada constituye una violación del Código Imperial 0091-C.</span>
+        </div>
+      </div>
+
+      <br>
+      <p class="section__desc">
+        Bienvenido al Domo, núcleo de desarrollo y estabilidad imperial.
+        El acceso a esta información lo acredita como parte de un sistema diseñado para garantizar el progreso continuo de nuestra civilización.
+        Su labor contribuye directamente a la eficiencia y permanencia del Imperio.
+      </p>
+
+      <!-- ══ 2. PANEL BENEFICIOS ══ -->
+      <div class="benefits-repo">
+        <!-- Sidebar nav -->
+        <div class="benefits-repo__nav">
+          <div class="benefits-repo__nav-header">ÍNDICE // REG. BIENESTAR</div>
+          <div class="benefits-repo__nav-item active" onclick="switchBenefit(0)">
+            <span class="benefits-repo__nav-num">01</span>
+            <span class="benefits-repo__nav-label">Acceso a Vivienda</span>
+          </div>
+          <div class="benefits-repo__nav-item" onclick="switchBenefit(1)">
+            <span class="benefits-repo__nav-num">02</span>
+            <span class="benefits-repo__nav-label">Programas de Formación</span>
+          </div>
+          <div class="benefits-repo__nav-item" onclick="switchBenefit(2)">
+            <span class="benefits-repo__nav-num">03</span>
+            <span class="benefits-repo__nav-label">Asignación Laboral</span>
+          </div>
+          <div class="benefits-repo__nav-item" onclick="switchBenefit(3)">
+            <span class="benefits-repo__nav-num">04</span>
+            <span class="benefits-repo__nav-label">Cobertura de Salud</span>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="benefits-repo__content">
+          <div class="benefits-repo__content-bar">
+            <div class="benefits-repo__content-bar-left">
+              <div class="benefits-repo__dots">
+                <div class="benefits-repo__dot"></div>
+                <div class="benefits-repo__dot"></div>
+                <div class="benefits-repo__dot"></div>
+              </div>
+              <span class="benefits-repo__path">REPOSITORIO / BENEFICIOS_DEL_SISTEMA_IMPERIAL / <span id="benefitPathLabel">VIVIENDA</span></span>
+            </div>
+            <span class="benefits-repo__status">ACTIVO</span>
+          </div>
+
+          <!-- Panel 0: Vivienda -->
+          <div class="benefits-repo__panel active" id="benefit-0">
+            <span class="benefits-repo__entry-id">REG-BEN-001 // VIVIENDA IMPERIAL</span>
+            <h3 class="benefits-repo__entry-title">Acceso garantizado a vivienda dentro de los sectores designados</h3>
+            <p class="benefits-repo__entry-body">
+              El sistema garantiza alojamiento estable a todos los ciudadanos clasificados dentro del programa de integración imperial. Las unidades habitacionales son asignadas según perfil funcional, sector de actividad y clasificación de linaje. La solicitud de reasignación debe tramitarse ante el Prefecto de Sector correspondiente.
+            </p>
+            <div class="benefits-repo__img-placeholder">
+                <img src="assets/img/img_beneficios1.png">
+            </div>
+          </div>
+
+          <!-- Panel 1: Formación -->
+          <div class="benefits-repo__panel" id="benefit-1">
+            <span class="benefits-repo__entry-id">REG-BEN-002 // FORMACIÓN FAMILIAR</span>
+            <h3 class="benefits-repo__entry-title">Integración en programas de desarrollo y formación para unidades familiares</h3>
+            <p class="benefits-repo__entry-body">
+              El Imperio garantiza acceso a módulos de formación continua para unidades familiares inscritas en el registro ciudadano. Los programas abarcan instrucción técnica, educación ideológica y desarrollo funcional según asignación de sector. La participación en los ciclos formativos es condición para la renovación del estatus de beneficio.
+            </p>
+            <div class="benefits-repo__img-placeholder">
+              <img src="assets/img/img_beneficios2.png">
+            </div>
+          </div>
+
+          <!-- Panel 2: Laboral -->
+          <div class="benefits-repo__panel" id="benefit-2">
+            <span class="benefits-repo__entry-id">REG-BEN-003 // ASIGNACIÓN LABORAL</span>
+            <h3 class="benefits-repo__entry-title">Asignación laboral continua según capacidades y necesidades del sistema</h3>
+            <p class="benefits-repo__entry-body">
+              Ningún ciudadano inscrito queda fuera del sistema productivo. La asignación laboral es determinada por el perfil funcional generado durante la evaluación en la crianza estatal y actualizado periódicamente. El cumplimiento de las cuotas de producción asignadas garantiza la continuidad de todos los demás beneficios del sistema.
+            </p>
+            <div class="benefits-repo__img-placeholder">
+             <img src="assets/img/img_beneficios3.png">
+            </div>
+          </div>
+
+          <!-- Panel 3: Salud -->
+          <div class="benefits-repo__panel" id="benefit-3">
+            <span class="benefits-repo__entry-id">REG-BEN-004 // SALUD IMPERIAL</span>
+            <h3 class="benefits-repo__entry-title">Cobertura integral de salud y mantenimiento físico</h3>
+            <p class="benefits-repo__entry-body">
+              El Imperio provee acceso a instalaciones médicas autorizadas para el mantenimiento físico de sus ciudadanos activos. Los procedimientos cubiertos incluyen atención de urgencia, control de rendimiento funcional y revisiones periódicas de chip. Tratamientos experimentales o de rehabilitación avanzada están sujetos a aprobación del Consejo de Hierro.
+            </p>
+            <div class="benefits-repo__img-placeholder">
+              <img src="assets/img/img_beneficios4.png">
+            </div>
+          </div>
+
+          <!-- Footer note -->
+          <div class="benefits-repo__footer">
+            La permanencia de estos beneficios está sujeta al cumplimiento de los lineamientos y valores establecidos por el Imperio.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 3. ECO-ITEMS — estilo expediente ══ -->
+    <div class="eco-grid">
+      <div class="eco-item">
+        <div class="eco-item__header">
+          <span class="eco-item__id">EXP-001 // INFRAESTRUCTURA</span>
+          <div class="eco-item__status-dot"></div>
+        </div>
+        <div class="eco-item__body">
+          <span class="eco-item__icon">&#9881;</span>
+          <span class="eco-item__label">Registro Clasificado</span>
+          <h4 class="eco-item__title">El Domo</h4>
+          <p class="eco-item__text">Una estructura colosal que cubre la ciudad, aislándola del mundo exterior. Nadie sabe qué hay más allá.</p>
+        </div>
+        <div class="eco-item__scan"></div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-item__header">
+          <span class="eco-item__id">EXP-002 // PODER CENTRAL</span>
+          <div class="eco-item__status-dot"></div>
+        </div>
+        <div class="eco-item__body">
+          <span class="eco-item__icon">&#9763;</span>
+          <span class="eco-item__label">Registro Clasificado</span>
+          <h4 class="eco-item__title">El Imperio</h4>
+          <p class="eco-item__text">Un linaje milenario que gobierna con mano de hierro. Su poder se sustenta en el control absoluto del mineral.</p>
+        </div>
+        <div class="eco-item__scan"></div>
+      </div>
+      <div class="eco-item">
+        <div class="eco-item__header">
+          <span class="eco-item__id">EXP-003 // RECURSO ESTRATÉGICO</span>
+          <div class="eco-item__status-dot"></div>
+        </div>
+        <div class="eco-item__body">
+          <span class="eco-item__icon">&#9889;</span>
+          <span class="eco-item__label">Registro Clasificado</span>
+          <h4 class="eco-item__title">Veridium</h4>
+          <p class="eco-item__text">Fuente de energía, medicina y control. Su extracción en las minas es el motor y la condena de la ciudad.</p>
+        </div>
+        <div class="eco-item__scan"></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ══ 4. ACCESO OBRA NUCLEO — REPOSITORIO ══ -->
+  <section class="section reveal" id="acceso">
+    <div class="section__header">
+      <span class="section__label">// Obra Nucleo</span>
+      <h2 class="section__title">Sistema de <span>Acceso</span></h2>
+      <p class="section__desc">
+        Repositorio imperial de nodos clasificados. Seleccione un archivo para iniciar la sesión de acceso.
+      </p>
+    </div>
+
+    <div class="repo-system">
+      <!-- Top bar -->
+      <div class="repo-system__bar">
+        <div class="repo-system__bar-left">
+          <div class="repo-system__dots">
+            <div class="repo-system__dot"></div>
+            <div class="repo-system__dot"></div>
+            <div class="repo-system__dot"></div>
+          </div>
+          <span class="repo-system__title">SISTEMA_REPOSITORIO_ASTER.db // ACCESO MONITORIZADO</span>
+        </div>
+      </div>
+
+      <!-- Body: tree + viewer -->
+      <div class="repo-system__body">
+        <!-- File tree -->
+        <div class="repo-tree">
+          <div class="repo-tree__header">> ÁRBOL DE ARCHIVOS</div>
+
+          <div class="repo-tree__group">
+            <div class="repo-tree__group-label">// NODO NÚCLEO</div>
+            <div class="repo-tree__file active" onclick="switchRepo('nucleus')" id="rfile-nucleus">
+              <span class="repo-tree__file-icon">★</span>
+              <span class="repo-tree__file-name">OBRA_NUCLEO.arc</span>
+              <span class="repo-tree__file-badge">PRIORITARIO</span>
+            </div>
+          </div>
+
+          <div class="repo-tree__group">
+            <div class="repo-tree__group-label">// NODOS IMPERIALES</div>
+            <div class="repo-tree__file" onclick="switchRepo('terminal')" id="rfile-terminal">
+              <span class="repo-tree__file-icon">⬛</span>
+              <span class="repo-tree__file-name">TERMINAL.imp</span>
+              <span class="repo-tree__file-badge repo-tree__file-badge--ok">ACTIVO</span>
+            </div>
+            <div class="repo-tree__file" onclick="switchRepo('laboratorio')" id="rfile-laboratorio">
+              <span class="repo-tree__file-icon">⬛</span>
+              <span class="repo-tree__file-name">LABORATORIO.lab</span>
+              <span class="repo-tree__file-badge repo-tree__file-badge--ok">ACTIVO</span>
+            </div>
+            <div class="repo-tree__file" onclick="switchRepo('archivos')" id="rfile-archivos">
+              <span class="repo-tree__file-icon">⬛</span>
+              <span class="repo-tree__file-name">ARCHIVOS.enc</span>
+              <span class="repo-tree__file-badge">RESTRINGIDO</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewer -->
+        <div class="repo-viewer">
+          <div class="repo-viewer__breadcrumb">
+            REPOSITORIO / <span id="repoBreadcrumb">OBRA_NUCLEO.arc</span>
+          </div>
+
+          <!-- Nucleus record -->
+          <div class="repo-record active" id="rec-nucleus">
+            <div class="repo-nucleus">
+              <p class="repo-nucleus__label">ACCESO PRIORITARIO — ARCHIVO NÚCLEO</p>
+              <h3 class="repo-nucleus__title">Piel y Engranajes</h3>
+              <p class="repo-nucleus__desc">
+                Novela gráfica. Documento del universo ASTER. Contiene el registro narrativo completo de los eventos del Ciclo 8821, el origen de la Entidad y el legado del científico Hall Varrow.<br>
+                <span style="color:var(--brass)">Clasificación: Obra Núcleo — Acceso Autorizado</span>
+              </p>
+              <!-- ENLACE: agregar href cuando esté disponible -->
+              <a href="#" class="repo-nucleus__link-placeholder">ABRIR ARCHIVO NÚCLEO</a>
+            </div>
+          </div>
+
+          <!-- Terminal record -->
+          <div class="repo-record" id="rec-terminal">
+            <div class="repo-record__header">
+              <span class="repo-record__id">NODO-IMP // SISTEMA SOCIAL Y POLÍTICO</span>
+              <span class="repo-record__badge">ACTIVO</span>
+            </div>
+            <h3 class="repo-record__title">La Terminal</h3>
+            <p class="repo-record__desc">
+              Sistema Social, Estructura Política y documentos del poder imperial. Acceso a los nodos del sistema: economía y mineral, crianza estatal, estructura de gobierno.
+            </p>
+            <a href="terminal.html" class="repo-record__link">INICIAR SESIÓN — TERMINAL.IMP</a>
+            <div class="repo-record__preview">
+              <img src="assets/img/img_terminal.png" alt="Terminal Imperial">
+            </div>
+          </div>
+
+          <!-- Laboratorio record -->
+          <div class="repo-record" id="rec-laboratorio">
+            <div class="repo-record__header">
+              <span class="repo-record__id">NODO-LAB // INVESTIGACIÓN TECNOLÓGICA</span>
+              <span class="repo-record__badge">ACTIVO</span>
+            </div>
+            <h3 class="repo-record__title">El Laboratorio</h3>
+            <p class="repo-record__desc">
+              Sistema de búsqueda terminal imperial. Nivel de acceso: Clandestino.
+            </p>
+            <a href="laboratorio.html" class="repo-record__link">INICIAR SESIÓN — LABORATORIO.LAB</a>
+            <div class="repo-record__preview">
+              <img src="assets/img/img_lab.png" alt="Laboratorio">
+            </div>
+          </div>
+
+          <!-- Archivos record -->
+          <div class="repo-record" id="rec-archivos">
+            <div class="repo-record__header">
+              <span class="repo-record__id">NODO-ARC // MATERIAL DESBLOQUEABLE</span>
+              <span class="repo-record__badge" style="color:#ff4444;border-color:#ff444480">RESTRINGIDO</span>
+            </div>
+            <h3 class="repo-record__title">Los Archivos</h3>
+            <p class="repo-record__desc">
+              Documentación detallada de procesos de investigación realizados a nombre del Imperio. Requiere código de acceso Clase-V para contenido completo.
+            </p>
+            <a href="archivos.html" class="repo-record__link">INICIAR SESIÓN — ARCHIVOS.ENC</a>
+            <div class="repo-record__preview">
+              <img src="assets/img/img_archivos.png" alt="Archivos">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="repo-system__statusbar">
+        <span class="repo-system__statusbar-item"><strong>NODOS:</strong> 4 registros</span>
+        <span class="repo-system__statusbar-item"><strong>ESTADO:</strong> Sistema operativo</span>
+        <span class="repo-system__statusbar-item"><strong>MONITOREO:</strong> Activo</span>
+        <span class="repo-system__statusbar-item"><strong>CICLO:</strong> 8821</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__logo">ASTER</div>
+    <p class="footer__text">Proyecto Transmedia // Todos los sistemas monitoreados</p>
+    <ul class="footer__links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="terminal.html">Terminal</a></li>
+      <li><a href="laboratorio.html">Laboratorio</a></li>
+      <li><a href="archivos.html">Archivos</a></li>
+      <li><a href="#" onclick="openContactPanel(); return false;" style="color:var(--green-neon);text-shadow:0 0 8px var(--green-glow);">Contacto</a></li>
+    </ul>
+  </footer>
+
+  <!-- ══ CONTACT PANEL OVERLAY ══ -->
+  <div id="contactOverlay" onclick="handleContactOverlayClick(event)" style="
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(6px);
+    z-index:9500;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease;">
+    <div style="
+      position:relative;
+      width:min(620px,92vw);
+      max-height:85vh;
+      overflow-y:auto;
+      background:rgba(0,5,0,.97);
+      border:1px solid rgba(57,255,20,.3);
+      border-top:3px solid var(--green-neon);
+      box-shadow:0 0 60px rgba(57,255,20,.12);
+      scrollbar-width:thin;
+      scrollbar-color:var(--green-dim) transparent;
+      animation:panelSlideIn .35s ease forwards;">
+      <!-- Top bar -->
+      <div style="
+        display:flex;align-items:center;justify-content:space-between;
+        padding:12px var(--space-lg);
+        background:rgba(57,255,20,.06);
+        border-bottom:1px solid rgba(57,255,20,.15);
+        position:sticky;top:0;backdrop-filter:blur(4px);">
+        <div style="display:flex;align-items:center;gap:var(--space-md);">
+          <div style="display:flex;gap:5px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#ff4444;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--brass);"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green-neon);box-shadow:0 0 4px var(--green-neon);"></div>
+          </div>
+          <span style="font-family:var(--font-code);font-size:.68rem;color:var(--green-dim);letter-spacing:2px;">DIRECTORIO_PROYECTO.enc // EQUIPO CREATIVO</span>
+        </div>
+        <button onclick="closeContactPanel()" style="
+          background:transparent;border:1px solid rgba(255,68,68,.4);
+          color:#ff4444;font-family:var(--font-code);font-size:.75rem;
+          font-weight:700;padding:4px 12px;cursor:pointer;letter-spacing:2px;
+          transition:all .2s;"
+          onmouseover="this.style.background='#ff4444';this.style.color='#000';"
+          onmouseout="this.style.background='transparent';this.style.color='#ff4444';">✕ CERRAR</button>
+      </div>
+      <!-- Body -->
+      <div style="padding:var(--space-xl);">
+        <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-neon);letter-spacing:4px;text-transform:uppercase;display:block;margin-bottom:var(--space-sm);">// EQUIPO DETRÁS DEL PROYECTO</span>
+        <h3 style="font-family:var(--font-imperial);font-size:1.5rem;color:var(--cream);margin-bottom:var(--space-md);">Piel y Engranajes — Contacto</h3>
+        <p style="font-family:var(--font-code);font-size:.78rem;color:var(--iron-light);line-height:1.8;margin-bottom:var(--space-xl);border-left:2px solid rgba(57,255,20,.2);padding-left:var(--space-md);">
+          Listado de personas autorizadas involucradas en el desarrollo del universo ASTER. Para consultas relacionadas con el proyecto, use los canales indicados a continuación.
+        </p>
+
+        <!-- Contact entries -->
+        <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+
+          <!-- 1 -->
+          <div class="contact-card" style="background:rgba(13,13,10,.9);border:1px solid rgba(218,165,32,.2);border-left:3px solid var(--bronze);padding:var(--space-lg);transition:border-left-color .3s;"
+            onmouseover="this.style.borderLeftColor='var(--green-neon)'"
+            onmouseout="this.style.borderLeftColor='var(--bronze)'">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-dim);letter-spacing:2px;">REG-001</span>
+              <span style="font-family:var(--font-code);font-size:.58rem;color:var(--green-neon);border:1px solid var(--green-dim);padding:2px 8px;letter-spacing:1px;">ACTIVO</span>
+            </div>
+            <p style="font-family:var(--font-imperial);font-size:1.05rem;color:var(--cream);margin-bottom:4px;">Valeria Alvarez Monsalve</p>
+            <a href="mailto:Valeriaalvarez448@gmail.com" style="font-family:var(--font-code);font-size:.75rem;color:var(--green-neon);letter-spacing:1px;text-decoration:none;">&gt; Valeriaalvarez448@gmail.com</a>
+          </div>
+
+          <!-- 2 -->
+          <div style="background:rgba(13,13,10,.9);border:1px solid rgba(218,165,32,.2);border-left:3px solid var(--bronze);padding:var(--space-lg);transition:border-left-color .3s;"
+            onmouseover="this.style.borderLeftColor='var(--green-neon)'"
+            onmouseout="this.style.borderLeftColor='var(--bronze)'">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-dim);letter-spacing:2px;">REG-002</span>
+              <span style="font-family:var(--font-code);font-size:.58rem;color:var(--green-neon);border:1px solid var(--green-dim);padding:2px 8px;letter-spacing:1px;">ACTIVO</span>
+            </div>
+            <p style="font-family:var(--font-imperial);font-size:1.05rem;color:var(--cream);margin-bottom:4px;">Nicolas David Rios Vargas</p>
+            <a href="mailto:nicolasdrv10@gmail.com" style="font-family:var(--font-code);font-size:.75rem;color:var(--green-neon);letter-spacing:1px;text-decoration:none;">&gt; nicolasdrv10@gmail.com</a>
+          </div>
+
+          <!-- 3 -->
+          <div style="background:rgba(13,13,10,.9);border:1px solid rgba(218,165,32,.2);border-left:3px solid var(--bronze);padding:var(--space-lg);transition:border-left-color .3s;"
+            onmouseover="this.style.borderLeftColor='var(--green-neon)'"
+            onmouseout="this.style.borderLeftColor='var(--bronze)'">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-dim);letter-spacing:2px;">REG-003</span>
+              <span style="font-family:var(--font-code);font-size:.58rem;color:var(--green-neon);border:1px solid var(--green-dim);padding:2px 8px;letter-spacing:1px;">ACTIVO</span>
+            </div>
+            <p style="font-family:var(--font-imperial);font-size:1.05rem;color:var(--cream);margin-bottom:4px;">Juan Jose Betancur Soto</p>
+            <a href="mailto:Juanjo.juanjo.3016@gmail.com" style="font-family:var(--font-code);font-size:.75rem;color:var(--green-neon);letter-spacing:1px;text-decoration:none;">&gt; Juanjo.juanjo.3016@gmail.com</a>
+          </div>
+
+          <!-- 4 -->
+          <div style="background:rgba(13,13,10,.9);border:1px solid rgba(218,165,32,.2);border-left:3px solid var(--bronze);padding:var(--space-lg);transition:border-left-color .3s;"
+            onmouseover="this.style.borderLeftColor='var(--green-neon)'"
+            onmouseout="this.style.borderLeftColor='var(--bronze)'">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-dim);letter-spacing:2px;">REG-004</span>
+              <span style="font-family:var(--font-code);font-size:.58rem;color:var(--green-neon);border:1px solid var(--green-dim);padding:2px 8px;letter-spacing:1px;">ACTIVO</span>
+            </div>
+            <p style="font-family:var(--font-imperial);font-size:1.05rem;color:var(--cream);margin-bottom:4px;">Mateo Mancera</p>
+            <a href="mailto:mateomancera506@gmail.com" style="font-family:var(--font-code);font-size:.75rem;color:var(--green-neon);letter-spacing:1px;text-decoration:none;">&gt; mateomancera506@gmail.com</a>
+          </div>
+
+          <!-- 5 -->
+          <div style="background:rgba(13,13,10,.9);border:1px solid rgba(218,165,32,.2);border-left:3px solid var(--bronze);padding:var(--space-lg);transition:border-left-color .3s;"
+            onmouseover="this.style.borderLeftColor='var(--green-neon)'"
+            onmouseout="this.style.borderLeftColor='var(--bronze)'">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-family:var(--font-code);font-size:.6rem;color:var(--green-dim);letter-spacing:2px;">REG-005</span>
+              <span style="font-family:var(--font-code);font-size:.58rem;color:var(--green-neon);border:1px solid var(--green-dim);padding:2px 8px;letter-spacing:1px;">ACTIVO</span>
+            </div>
+            <p style="font-family:var(--font-imperial);font-size:1.05rem;color:var(--cream);margin-bottom:4px;">Isabel Arias Méndez</p>
+            <a href="mailto:yililemon88@gmail.com" style="font-family:var(--font-code);font-size:.75rem;color:var(--green-neon);letter-spacing:1px;text-decoration:none;">&gt; yililemon88@gmail.com</a>
+          </div>
+
+        </div>
+        <p style="margin-top:var(--space-xl);font-family:var(--font-code);font-size:.65rem;color:var(--green-dim);letter-spacing:1px;text-align:center;">&gt; Proyecto ASTER — Universo Transmedia // Ciclo 8821</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openContactPanel() {
+      var o = document.getElementById('contactOverlay');
+      o.style.opacity = '1';
+      o.style.pointerEvents = 'all';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeContactPanel() {
+      var o = document.getElementById('contactOverlay');
+      o.style.opacity = '0';
+      o.style.pointerEvents = 'none';
+      document.body.style.overflow = '';
+    }
+    function handleContactOverlayClick(e) {
+      if (e.target === document.getElementById('contactOverlay')) closeContactPanel();
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeContactPanel();
+    });
+  </script>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    /* ── PANEL BENEFICIOS: navegación interna ── */
+    var benefitPaths = ['VIVIENDA', 'FORMACIÓN', 'ASIGNACIÓN LABORAL', 'SALUD'];
+
+    function switchBenefit(index) {
+      var items = document.querySelectorAll('.benefits-repo__nav-item');
+      var panels = document.querySelectorAll('.benefits-repo__panel');
+      var pathLabel = document.getElementById('benefitPathLabel');
+
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.toggle('active', i === index);
+      }
+      for (var j = 0; j < panels.length; j++) {
+        panels[j].classList.toggle('active', j === index);
+      }
+      if (pathLabel) pathLabel.textContent = benefitPaths[index];
+    }
+
+    /* ── REPOSITORIO NODOS: navegación ── */
+    var repoFiles = ['nucleus', 'terminal', 'laboratorio', 'archivos'];
+    var repoPaths = {
+      nucleus:     'OBRA_NUCLEO.arc',
+      terminal:    'TERMINAL.imp',
+      laboratorio: 'LABORATORIO.lab',
+      archivos:    'ARCHIVOS.enc'
+    };
+
+    function switchRepo(key) {
+      var breadcrumb = document.getElementById('repoBreadcrumb');
+
+      repoFiles.forEach(function(k) {
+        var file = document.getElementById('rfile-' + k);
+        var rec  = document.getElementById('rec-'   + k);
+        if (file) file.classList.toggle('active', k === key);
+        if (rec)  rec.classList.toggle('active',  k === key);
+      });
+
+      if (breadcrumb && repoPaths[key]) {
+        breadcrumb.textContent = repoPaths[key];
+      }
+    }
+  </script>
+</body>
+</html>
