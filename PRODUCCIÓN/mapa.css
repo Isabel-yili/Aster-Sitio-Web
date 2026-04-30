@@ -1,48 +1,28 @@
 /* ================================================================
-   MAPA INTERACTIVO RPG — mapa.css
-   Fuentes requeridas: Cinzel + Crimson Text (Google Fonts)
-   Diseño: oscuro, elegante, estilo videojuego de fantasía
+   MAPA INTERACTIVO — mapa.css
+   Estética: ASTER — sistema imperial, base de datos, cyberpunk
+   Variables heredadas de style.css (--green-neon, --brass, etc.)
 ================================================================ */
 
 /* ---------------------------------------------------------------
-   1. VARIABLES GLOBALES
+   1. VARIABLES SCOPED
 --------------------------------------------------------------- */
-:root {
-  /* Paleta */
-  --c-bg:          #08070a;
-  --c-panel-bg:    #222;
-  --c-border:      #2e2540;
-  --c-border-glow: #4a3a6a;
-  --c-gold:        #c8a84b;
-  --c-gold-dim:    #7a6530;
-  --c-gold-bright: #f0d878;
-  --c-amber:       #e07830;
-  --c-teal:        #3ab8b0;
-  --c-text:        #e2d8c8;
-  --c-text-dim:    #8a7a6a;
-  --c-text-faint:  #4a3e30;
-
-  /* Hotspot pulse colors */
-  --c-pulse:       rgba(200, 168, 75, 0.6);
-  --c-pulse-outer: rgba(200, 168, 75, 0.15);
-
-  /* Dimensiones */
-  --panel-w:       340px;
-  --header-h:      64px;
-  --border-radius: 2px;
-
-  /* Transiciones */
-  --transition-fast:   0.18s ease;
-  --transition-mid:    0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow:   0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Sombras */
-  --shadow-panel:  0 0 60px rgba(0,0,0,0.8), 0 0 120px rgba(0,0,0,0.4);
-  --shadow-glow:   0 0 16px rgba(200,168,75,0.4);
+#mapa-interactivo {
+  --map-bg:           rgba(0, 5, 0, 0.95);
+  --map-border:       rgba(57, 255, 20, 0.25);
+  --map-border-top:   var(--green-neon, #39ff14);
+  --map-glow:         rgba(57, 255, 20, 0.07);
+  --map-pulse:        rgba(57, 255, 20, 0.6);
+  --map-pulse-outer:  rgba(57, 255, 20, 0.12);
+  --map-panel-w:      340px;
+  --map-scan-color:   rgba(57, 255, 20, 0.03);
+  --t-fast:  0.18s ease;
+  --t-mid:   0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --t-slow:  0.5s  cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ---------------------------------------------------------------
-   2. RESET SCOPED (solo dentro del componente)
+   2. RESET SCOPED
 --------------------------------------------------------------- */
 #mapa-interactivo *,
 #mapa-interactivo *::before,
@@ -52,277 +32,245 @@
   padding: 0;
 }
 
+/* ---------------------------------------------------------------
+   3. WRAPPER PRINCIPAL
+--------------------------------------------------------------- */
 #mapa-interactivo {
-  /* El componente se adapta al ancho de su contenedor padre */
   width: 100%;
-  background: var(--c-bg);
-  color: var(--c-text);
-  font-family: 'Crimson Text', Georgia, serif;
-  font-size: 16px;
-  line-height: 1.6;
   position: relative;
   overflow: hidden;
-
-  /* Borde decorativo exterior */
-  border: 1px solid var(--c-border);
-  box-shadow:
-    inset 0 0 80px rgba(0,0,0,0.6),
-    0 4px 40px rgba(0,0,0,0.6);
-
-  /* Patrón de textura sutil */
+  background: var(--map-bg);
+  color: var(--iron-light, #b0b8a0);
+  font-family: var(--font-code, 'Share Tech Mono', monospace);
+  font-size: 14px;
+  line-height: 1.6;
+  border: 1px solid var(--map-border);
+  border-top: 3px solid var(--map-border-top);
+  margin-bottom: var(--space-xl, 2rem);
   background-image:
-    radial-gradient(ellipse 120% 80% at 50% 0%, #16112a 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='rgba(255,255,255,0.015)'/%3E%3C/svg%3E");
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 2px,
+      var(--map-scan-color) 2px, var(--map-scan-color) 4px
+    );
+}
+
+/* Línea de escaneo animada */
+#mapa-interactivo::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green-neon, #39ff14), transparent);
+  animation: mapScan 7s linear infinite;
+  pointer-events: none;
+  z-index: 50;
+}
+
+@keyframes mapScan {
+  0%   { top: 0;    opacity: 0.5; }
+  100% { top: 100%; opacity: 0;   }
 }
 
 /* ---------------------------------------------------------------
-   3. HEADER
+   4. HEADER — igual que .video-panel__bar
 --------------------------------------------------------------- */
 .mapa-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  height: var(--header-h);
-  padding: 0 24px;
-  background: linear-gradient(180deg,
-    rgba(30, 20, 50, 0.95) 0%,
-    rgba(14, 10, 22, 0.9) 100%);
-  border-bottom: 1px solid var(--c-border);
+  justify-content: space-between;
+  padding: 10px var(--space-lg, 1.5rem);
+  background: rgba(57, 255, 20, 0.06);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.15);
   position: relative;
   z-index: 10;
+  gap: var(--space-md, 1rem);
 }
 
-/* Línea de luz superior */
-.mapa-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--c-gold-dim) 30%,
-    var(--c-gold) 50%,
-    var(--c-gold-dim) 70%,
-    transparent 100%);
+.mapa-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md, 1rem);
 }
+
+.mapa-header__dots {
+  display: flex;
+  gap: 5px;
+}
+
+.mapa-header__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.mapa-header__dot:nth-child(1) { background: #ff4444; box-shadow: 0 0 4px #ff4444; }
+.mapa-header__dot:nth-child(2) { background: var(--brass, #b8860b); box-shadow: 0 0 4px var(--brass, #b8860b); }
+.mapa-header__dot:nth-child(3) { background: var(--green-neon, #39ff14); box-shadow: 0 0 4px var(--green-neon, #39ff14); }
 
 .mapa-header__titulo {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  font-weight: 900;
-  letter-spacing: 4px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.67rem;
+  color: var(--green-dim, #4a7c4a);
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--c-gold);
-  text-shadow:
-    0 0 20px rgba(200,168,75,0.5),
-    0 1px 0 rgba(0,0,0,0.8);
+  font-weight: normal;
+}
+
+.mapa-header__badge {
+  font-family: var(--font-code, monospace);
+  font-size: 0.58rem;
+  color: var(--green-neon, #39ff14);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  padding: 2px 8px;
+  letter-spacing: 1px;
+  animation: mapBadgeBlink 3s infinite;
   white-space: nowrap;
 }
 
-/* Ornamentos laterales tipo Art Deco */
-.mapa-header__ornament {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--c-gold-dim) 60%,
-    var(--c-gold) 100%
-  );
-  position: relative;
-}
-.mapa-header__ornament.right {
-  transform: scaleX(-1);
-}
-.mapa-header__ornament::before {
-  content: '◈';
-  position: absolute;
-  right: -2px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 8px;
-  color: var(--c-gold);
-  line-height: 1;
+@keyframes mapBadgeBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
 /* ---------------------------------------------------------------
-   4. LAYOUT PRINCIPAL
+   5. META BAR
+--------------------------------------------------------------- */
+.mapa-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-lg, 1.5rem);
+  padding: 6px var(--space-lg, 1.5rem);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.08);
+  background: rgba(57, 255, 20, 0.02);
+}
+
+.mapa-meta__item {
+  font-family: var(--font-code, monospace);
+  font-size: 0.62rem;
+  color: var(--green-dim, #4a7c4a);
+  letter-spacing: 1px;
+}
+.mapa-meta__item strong {
+  color: var(--brass, #b8860b);
+  margin-right: 4px;
+}
+
+/* ---------------------------------------------------------------
+   6. LAYOUT PRINCIPAL
 --------------------------------------------------------------- */
 .mapa-layout {
   display: flex;
   position: relative;
-  /* Altura del componente: ajusta este valor según necesites */
-  height: clamp(400px, 60vw, 680px);
+  height: clamp(400px, 58vw, 660px);
 }
 
 /* ---------------------------------------------------------------
-   5. CONTENEDOR DEL MAPA
+   7. CONTENEDOR DEL MAPA
 --------------------------------------------------------------- */
 .mapa-contenedor {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background-color: #0d1018;
-
-  /* La imagen de fondo la aplica JS, pero definimos el estilo aquí */
+  background-color: #010801;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-
-  /* Cursor personalizado tipo pergamino */
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='10' y1='2' x2='10' y2='6' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='10' y1='14' x2='10' y2='18' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='2' y1='10' x2='6' y2='10' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='14' y1='10' x2='18' y2='10' stroke='%23c8a84b' stroke-width='1.5'/%3E%3C/svg%3E") 10 10, crosshair;
+  cursor: crosshair;
 }
 
-/* Viñeta que oscurece los bordes del mapa */
 .mapa-overlay-vignette {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 85% 85% at 50% 50%,
-      transparent 40%,
-      rgba(0,0,0,0.6) 100%);
+  background: radial-gradient(ellipse 85% 85% at 50% 50%, transparent 40%, rgba(0, 5, 0, 0.65) 100%);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Efecto hover en el mapa completo */
 .mapa-contenedor:hover .mapa-overlay-vignette {
-  background:
-    radial-gradient(ellipse 85% 85% at 50% 50%,
-      transparent 50%,
-      rgba(0,0,0,0.5) 100%);
-  transition: background var(--transition-mid);
+  background: radial-gradient(ellipse 85% 85% at 50% 50%, transparent 50%, rgba(0, 5, 0, 0.5) 100%);
+  transition: background var(--t-mid);
 }
 
 /* ---------------------------------------------------------------
-   6. HOTSPOTS
+   8. HOTSPOTS
 --------------------------------------------------------------- */
 .hotspot {
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 5;
   cursor: pointer;
-
-  /* Tamaño del área clicable */
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Ícono central (el punto visible) */
 .hotspot__icono {
   position: relative;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--c-gold);
-  border: 2px solid var(--c-gold-bright);
-  box-shadow:
-    0 0 8px var(--c-pulse),
-    0 0 0 4px rgba(200,168,75,0.15);
-  transition:
-    transform var(--transition-fast),
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
+  width: 10px; height: 10px;
+  background: var(--green-neon, #39ff14);
+  border: 1px solid rgba(57, 255, 20, 0.6);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px var(--map-pulse), 0 0 0 3px var(--map-pulse-outer);
+  transition: transform var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
   z-index: 2;
 }
 
-/* Diamond shape para algunos hotspots (clase opcional) */
-.hotspot.diamond .hotspot__icono {
-  border-radius: 2px;
-  transform: rotate(45deg);
-  width: 12px;
-  height: 12px;
-}
-.hotspot.diamond:hover .hotspot__icono {
-  transform: rotate(45deg) scale(1.3);
-}
-
-/* Anillo de pulse externo (animación continua) */
-.hotspot__pulse {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--c-gold);
-  opacity: 0;
-  animation: hotspot-pulse 2.4s ease-out infinite;
-  pointer-events: none;
-}
-
-/* Segundo anillo con delay */
+.hotspot__pulse,
 .hotspot__pulse2 {
   position: absolute;
-  width: 36px;
-  height: 36px;
+  width: 32px; height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--c-gold);
+  border: 1px solid rgba(57, 255, 20, 0.5);
   opacity: 0;
-  animation: hotspot-pulse 2.4s ease-out infinite 0.8s;
+  animation: hotspot-pulse 2.6s ease-out infinite;
   pointer-events: none;
 }
+.hotspot__pulse2 { animation-delay: 0.9s; }
 
 @keyframes hotspot-pulse {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
+  0%   { transform: scale(0.4); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0;   }
 }
 
-/* Etiqueta flotante del nombre */
 .hotspot__label {
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(4px);
   white-space: nowrap;
-
-  font-family: 'Cinzel', serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--c-gold);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(200,168,75,0.3);
-
-  background: rgba(8, 6, 14, 0.82);
-  border: 1px solid rgba(200,168,75,0.3);
+  color: var(--green-neon, #39ff14);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+  background: rgba(0, 5, 0, 0.92);
+  border: 1px solid rgba(57, 255, 20, 0.3);
   padding: 3px 8px;
-
   pointer-events: none;
   opacity: 0;
-  transform: translateX(-50%) translateY(4px);
-  transition:
-    opacity var(--transition-fast),
-    transform var(--transition-fast);
+  transition: opacity var(--t-fast), transform var(--t-fast);
 }
 
-/* Flecha hacia abajo de la etiqueta */
+.hotspot__label::before {
+  content: '> ';
+  color: var(--green-dim, #4a7c4a);
+}
+
 .hotspot__label::after {
   content: '';
   position: absolute;
-  top: 100%;
-  left: 50%;
+  top: 100%; left: 50%;
   transform: translateX(-50%);
   border: 4px solid transparent;
-  border-top-color: rgba(200,168,75,0.3);
+  border-top-color: rgba(57, 255, 20, 0.3);
 }
 
-/* ESTADOS HOVER */
 .hotspot:hover .hotspot__icono {
-  transform: scale(1.5);
-  background: var(--c-gold-bright);
-  box-shadow:
-    0 0 16px rgba(200,168,75,0.8),
-    0 0 32px rgba(200,168,75,0.3),
-    0 0 0 6px rgba(200,168,75,0.15);
+  background: #fff;
+  box-shadow: 0 0 14px var(--green-neon, #39ff14), 0 0 0 4px rgba(57, 255, 20, 0.2);
+  transform: rotate(45deg) scale(1.3);
 }
 
 .hotspot:hover .hotspot__label {
@@ -330,274 +278,266 @@
   transform: translateX(-50%) translateY(0);
 }
 
-.hotspot:hover .hotspot__pulse,
-.hotspot:hover .hotspot__pulse2 {
-  border-color: var(--c-gold-bright);
-  animation-duration: 1.4s;
-}
-
-/* ESTADO ACTIVO (seleccionado) */
 .hotspot.activo .hotspot__icono {
-  background: var(--c-amber);
-  border-color: #ffb060;
-  box-shadow:
-    0 0 20px rgba(224,120,48,0.8),
-    0 0 40px rgba(224,120,48,0.3),
-    0 0 0 8px rgba(224,120,48,0.12);
-  animation: hotspot-selected 1s ease-in-out infinite alternate;
+  background: var(--brass, #b8860b);
+  box-shadow: 0 0 12px rgba(184, 134, 11, 0.7), 0 0 0 4px rgba(184, 134, 11, 0.15);
 }
 
-.hotspot.activo .hotspot__label {
-  opacity: 1;
-  color: var(--c-amber);
-  transform: translateX(-50%) translateY(0);
-}
-
-@keyframes hotspot-selected {
-  from { transform: scale(1.4); }
-  to   { transform: scale(1.7); }
-}
-
-/* Stagger de entrada (aplicado vía JS con delay inline) */
-.hotspot {
-  animation: hotspot-enter 0.5s ease both;
-}
-@keyframes hotspot-enter {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.3);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+.hotspot.activo .hotspot__pulse,
+.hotspot.activo .hotspot__pulse2 {
+  border-color: rgba(184, 134, 11, 0.5);
 }
 
 /* ---------------------------------------------------------------
-   7. PANEL LATERAL
+   9. PANEL LATERAL — estilo expediente ASTER
 --------------------------------------------------------------- */
 .mapa-panel {
   width: 0;
   flex-shrink: 0;
-  background: var(--c-panel-bg);
-  border-left: 1px solid var(--c-border);
+  background: rgba(0, 4, 0, 0.97);
+  border-left: 1px solid rgba(57, 255, 20, 0.15);
   overflow: hidden;
   position: relative;
-  transition: width var(--transition-slow);
-
+  transition: width var(--t-slow);
   display: flex;
   flex-direction: column;
-
-  /* Luz de borde izquierdo */
-  box-shadow: var(--shadow-panel);
 }
 
-/* Panel abierto */
 .mapa-panel.abierto {
-  width: var(--panel-w);
-  border-left-color: var(--c-border-glow);
+  width: var(--map-panel-w);
+  border-left-color: rgba(57, 255, 20, 0.3);
 }
 
-/* Textura del panel */
 .mapa-panel::before {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg,
-      rgba(74, 58, 106, 0.08) 0%,
-      transparent 40%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M30 0v60M0 30h60' stroke='rgba(255,255,255,0.012)' stroke-width='1'/%3E%3C/svg%3E");
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 2px,
+    rgba(57, 255, 20, 0.015) 2px, rgba(57, 255, 20, 0.015) 4px
+  );
   pointer-events: none;
   z-index: 0;
 }
 
-/* Botón cerrar */
-.panel-cerrar {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 20;
-  background: transparent;
-  border: 1px solid var(--c-border);
-  color: var(--c-text-dim);
-  font-size: 0.75rem;
-  width: 28px;
-  height: 28px;
+/* Barra superior del panel */
+.mapa-panel__bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    color var(--transition-fast),
-    border-color var(--transition-fast),
-    background var(--transition-fast);
-  border-radius: var(--border-radius);
-}
-.panel-cerrar:hover {
-  color: var(--c-gold);
-  border-color: var(--c-gold-dim);
-  background: rgba(200,168,75,0.08);
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(57, 255, 20, 0.05);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.12);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
-/* Imagen del territorio */
+.mapa-panel__bar-id {
+  font-family: var(--font-code, monospace);
+  font-size: 0.58rem;
+  color: var(--green-dim, #4a7c4a);
+  letter-spacing: 2px;
+}
+
+/* Botón cerrar */
+.panel-cerrar {
+  background: transparent;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  color: #ff4444;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+.panel-cerrar:hover {
+  background: #ff4444;
+  color: #000;
+}
+
+/* Imagen */
 .panel-imagen-wrap {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   flex-shrink: 0;
-  background: #0a0a0f;
+  background: #010801;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+  z-index: 1;
 }
 
 .panel-imagen {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
   display: block;
   opacity: 0;
-  transition: opacity var(--transition-mid);
+  transition: opacity var(--t-mid);
+  filter: saturate(0.55) contrast(1.15);
 }
+.panel-imagen.cargada { opacity: 1; }
 
-.panel-imagen.cargada {
-  opacity: 1;
-}
-
-/* Degradado sobre la imagen */
 .panel-imagen-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 40%,
-    var(--c-panel-bg) 100%
-  );
+  background: linear-gradient(to bottom, transparent 30%, rgba(0, 4, 0, 0.9) 100%);
   pointer-events: none;
 }
 
-/* Sin imagen: placeholder */
 .panel-imagen-wrap.sin-imagen {
   aspect-ratio: auto;
   height: 0;
 }
 
-/* Cuerpo del panel */
+/* Cuerpo */
 .panel-cuerpo {
-  padding: 20px 22px 24px;
+  padding: 16px 18px 20px;
   position: relative;
   z-index: 1;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-
-  /* Scrollbar estilizada */
   scrollbar-width: thin;
-  scrollbar-color: var(--c-border) transparent;
+  scrollbar-color: rgba(57, 255, 20, 0.2) transparent;
 }
 .panel-cuerpo::-webkit-scrollbar { width: 3px; }
-.panel-cuerpo::-webkit-scrollbar-thumb { background: var(--c-border); }
+.panel-cuerpo::-webkit-scrollbar-thumb { background: rgba(57, 255, 20, 0.2); }
 
 .panel-etiqueta {
-  font-family: 'Cinzel', serif;
-  font-size: 0.65rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.58rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--c-gold-dim);
+  color: var(--green-dim, #4a7c4a);
   margin-bottom: 6px;
+}
+.panel-etiqueta::before {
+  content: '// ';
+  color: var(--brass, #b8860b);
 }
 
 .panel-titulo {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 900;
-  color: var(--c-gold);
+  font-family: var(--font-imperial, serif);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: normal;
+  color: var(--cream, #f5f0e8);
   line-height: 1.2;
-  text-shadow: 0 0 20px rgba(200,168,75,0.3);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
-/* Divisor decorativo */
 .panel-divider {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 .panel-divider__linea {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--c-border));
+  background: linear-gradient(90deg, rgba(57, 255, 20, 0.2), transparent);
 }
 .panel-divider__linea:last-child {
-  background: linear-gradient(90deg, var(--c-border), transparent);
+  background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2));
 }
 .panel-divider__icono {
-  color: var(--c-gold-dim);
-  font-size: 0.9rem;
+  color: var(--brass, #b8860b);
+  font-size: 0.75rem;
   flex-shrink: 0;
 }
 
-/* Descripción */
 .panel-desc {
-  font-size: 0.95rem;
-  line-height: 1.75;
-  color: var(--c-text);
-  font-style: italic;
-  margin-bottom: 20px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: var(--iron-light, #b0b8a0);
+  margin-bottom: 16px;
+  border-left: 2px solid rgba(57, 255, 20, 0.15);
+  padding-left: 10px;
 }
 
-/* Stats / datos adicionales */
 .panel-stats {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 6px 12px;
-  font-size: 0.82rem;
+  gap: 4px 10px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(57, 255, 20, 0.1);
+  background: rgba(57, 255, 20, 0.02);
+  padding: 10px 12px;
 }
 .panel-stats dt {
-  color: var(--c-gold-dim);
-  font-family: 'Cinzel', serif;
-  font-size: 0.68rem;
-  letter-spacing: 1px;
+  color: var(--brass, #b8860b);
+  font-family: var(--font-code, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   white-space: nowrap;
   padding-top: 2px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.05);
+  padding-bottom: 3px;
 }
 .panel-stats dd {
-  color: var(--c-text);
+  color: var(--iron-light, #b0b8a0);
+  font-family: var(--font-code, monospace);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.05);
+  padding-bottom: 3px;
 }
 
-/* Animación de entrada del contenido del panel */
+/* Animación de entrada */
 .mapa-panel.abierto .panel-cuerpo > * {
-  animation: panel-content-in 0.4s ease both;
+  animation: panelItemIn 0.35s ease both;
 }
-.mapa-panel.abierto .panel-etiqueta  { animation-delay: 0.15s; }
-.mapa-panel.abierto .panel-titulo    { animation-delay: 0.2s; }
-.mapa-panel.abierto .panel-divider   { animation-delay: 0.25s; }
-.mapa-panel.abierto .panel-desc      { animation-delay: 0.3s; }
-.mapa-panel.abierto .panel-stats     { animation-delay: 0.35s; }
+.mapa-panel.abierto .panel-etiqueta { animation-delay: 0.12s; }
+.mapa-panel.abierto .panel-titulo   { animation-delay: 0.18s; }
+.mapa-panel.abierto .panel-divider  { animation-delay: 0.22s; }
+.mapa-panel.abierto .panel-desc     { animation-delay: 0.28s; }
+.mapa-panel.abierto .panel-stats    { animation-delay: 0.34s; }
 
-@keyframes panel-content-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes panelItemIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------------------------------------------------------------
-   8. OVERLAY DE CIERRE (móvil)
+   10. FOOTER DEL MAPA
+--------------------------------------------------------------- */
+.mapa-footer {
+  padding: 7px var(--space-lg, 1.5rem);
+  border-top: 1px solid rgba(57, 255, 20, 0.08);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg, 1.5rem);
+  background: rgba(0, 5, 0, 0.6);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.mapa-footer__text {
+  font-family: var(--font-code, monospace);
+  font-size: 0.6rem;
+  color: var(--green-dim, #4a7c4a);
+  letter-spacing: 1px;
+}
+.mapa-footer__text::before {
+  content: '> ';
+  color: var(--green-neon, #39ff14);
+}
+
+/* ---------------------------------------------------------------
+   11. OVERLAY CIERRE (móvil)
 --------------------------------------------------------------- */
 .mapa-overlay-cierre {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 8;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 5, 0, 0.6);
   opacity: 0;
-  transition: opacity var(--transition-mid);
+  transition: opacity var(--t-mid);
 }
 .mapa-overlay-cierre.visible {
   display: block;
@@ -605,90 +545,52 @@
 }
 
 /* ---------------------------------------------------------------
-   9. ESTADO DE CARGA (mientras carga la imagen)
+   12. CARGANDO
 --------------------------------------------------------------- */
 .mapa-contenedor.cargando::after {
-  content: 'Cargando mapa…';
+  content: 'CARGANDO_MAPA.dat...';
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel', serif;
-  font-size: 0.8rem;
-  letter-spacing: 3px;
-  color: var(--c-gold-dim);
+  font-family: var(--font-code, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  color: var(--green-dim, #4a7c4a);
   z-index: 4;
 }
 
 /* ---------------------------------------------------------------
-   10. RESPONSIVE
+   13. RESPONSIVE
 --------------------------------------------------------------- */
-
-/* Tablet: panel encima del mapa */
 @media (max-width: 768px) {
-  .mapa-layout {
-    flex-direction: column;
-    height: auto;
-  }
-
-  .mapa-contenedor {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    height: auto;
-  }
-
+  .mapa-layout { flex-direction: column; height: auto; }
+  .mapa-contenedor { width: 100%; aspect-ratio: 4 / 3; height: auto; }
   .mapa-panel {
     width: 100% !important;
     max-height: 0;
     border-left: none;
-    border-top: 1px solid var(--c-border);
-    transition: max-height var(--transition-slow);
+    border-top: 1px solid rgba(57, 255, 20, 0.15);
+    transition: max-height var(--t-slow);
   }
-
-  .mapa-panel.abierto {
-    width: 100% !important;
-    max-height: 400px;
-  }
-
-  .mapa-overlay-cierre {
-    display: none !important;
-  }
-
-  .panel-imagen-wrap {
-    aspect-ratio: 21 / 9;
-  }
+  .mapa-panel.abierto { width: 100% !important; max-height: 420px; }
+  .mapa-overlay-cierre { display: none !important; }
+  .panel-imagen-wrap { aspect-ratio: 21 / 9; }
 }
 
-/* Móvil: panel como drawer desde abajo */
 @media (max-width: 480px) {
-  .mapa-header__titulo {
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-  }
-
-  .mapa-contenedor {
-    aspect-ratio: 3 / 4;
-  }
-
-  /* Panel flotante sobre el mapa */
+  .mapa-header__titulo { font-size: 0.58rem; letter-spacing: 1px; }
+  .mapa-meta { display: none; }
+  .mapa-contenedor { aspect-ratio: 3 / 4; }
   .mapa-panel {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0; left: 0; right: 0;
     width: 100% !important;
     max-height: 0;
-    border-top: 1px solid var(--c-border-glow);
+    border-top: 1px solid rgba(57, 255, 20, 0.3);
     z-index: 10;
   }
-
-  .mapa-panel.abierto {
-    max-height: 70%;
-  }
-
-  .mapa-overlay-cierre {
-    display: block;
-    z-index: 9;
-  }
+  .mapa-panel.abierto { max-height: 70%; }
+  .mapa-overlay-cierre { display: block; z-index: 9; }
 }
