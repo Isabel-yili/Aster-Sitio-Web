@@ -25,7 +25,7 @@ const HOTSPOTS = [
   {
     id:     'aster',
     top:    '34%',
-    left:   '35.5%',
+    left:   '34%',
     nombre: 'Aster',
     desc:   'Una ciudad industrial asentada sobre vetas minerales inagotables. La población está compuesta en su mayoría por obreros mineros, ingenieros de vapor y técnicos especializados en maquinaria extractiva. Las jornadas son largas y el aire siempre denso por el polvo metálico. Las clases altas habitan estructuras elevadas, lejos de las minas, mientras que la mayoría vive en barrios compactos alrededor de los pozos de extracción. La economía gira casi exclusivamente en torno a la minería y el refinamiento de recursos.',
     imagen: './images/aaster.png',
@@ -35,7 +35,7 @@ const HOTSPOTS = [
   {
     id:     'nikolaia',
     top:    '21.5%',
-    left:   '31%',
+    left:   '29.4%',
     nombre: 'Nikolaia',
     desc:   'Una región selvática donde la población vive en simbiosis con su entorno. Sus habitantes utilizan tecnología biomecánica rudimentaria combinada con sistemas hidráulicos para desplazarse entre las copas de los árboles. La densidad poblacional es baja, organizada en comunidades cerradas que rechazan la industrialización pesada. Su economía se basa en recursos orgánicos, extracción controlada y conocimiento botánico.',
     imagen: './images/nikolaia.png',
@@ -45,7 +45,7 @@ const HOTSPOTS = [
   {
     id:     'dravencross',
     top:    '12.5%',
-    left:   '27.6%',
+    left:   '25%',
     nombre: 'Dravencross sur',
     desc:   'El núcleo político y extractivo de la nación dividida de Dravencross. A diferencia del resto del desierto rojo, esta región está casi completamente cubierta por nieve cenicienta, producto de reacciones térmicas subterráneas y emisiones industriales que enfrían la superficie. Bajo ese manto helado operan enormes complejos de perforación que descienden hacia vetas minerales profundas. La población está compuesta por obreros especializados en minería extrema, equipados con trajes térmicos y maquinaria de vapor reforzada. Las condiciones son brutales, lo que ha llevado a una fuerte centralización del poder: desde el sur se regula el flujo de recursos hacia el norte, manteniendo el control económico y político de toda la nación.',
     imagen: './images/dravencross1.png',
@@ -55,7 +55,7 @@ const HOTSPOTS = [
   {
     id:     'Valeront',
     top:    '41%',
-    left:   '27.5%',
+    left:   '25%',
     nombre: 'Valeront',
     desc:   'Una metrópolis densamente poblada donde la mayoría de sus habitantes trabaja en sectores administrativos, energéticos y de manufactura industrial. Las clases sociales están claramente divididas entre distritos elevados y zonas fabriles. Su población depende de redes energéticas complejas que requieren mantenimiento constante por ingenieros especializados.',
     imagen: './images/valeront.png',
@@ -65,7 +65,7 @@ const HOTSPOTS = [
   {
     id:     'regnum',
     top:    '13.6%',
-    left:   '38.3%',
+    left:   '37.2%',
     nombre: 'Regnum',
     desc:   'Una zona prácticamente despoblada donde solo operan expediciones industriales altamente especializadas. Equipos de extracción vertical descienden a las profundidades utilizando elevadores mecánicos reforzados. La población es temporal, compuesta por trabajadores enviados por contratos de alto riesgo.',
     imagen: './images/regnum.png',
@@ -75,7 +75,7 @@ const HOTSPOTS = [
   {
     id:     'arkenfall',
     top:    '27%',
-    left:   '70.5%',
+    left:   '72.7%',
     nombre: 'arkenfall',
     desc:   'Una región fértil que se ha consolidado como el principal proveedor de alimentos y semillas del mundo. Su población está compuesta por cultivadores, ingenieros agrónomos y operadores de sistemas de cultivo mecanizado. Utilizan tecnología de vapor y control climático para maximizar la producción. Mantienen relaciones amistosas con todas las regiones, ya que su estabilidad es clave para el abastecimiento global.',
     imagen: './images/arkenfall.png',
@@ -95,7 +95,7 @@ const HOTSPOTS = [
   {
   id:     'medellthor',
   top:    '62.5%',
-  left:   '66.3%',
+  left:   '67.6%',
   nombre: 'Medellthor',
   desc:   'La mayor potencia tecnológica del mundo. Su población está compuesta por ingenieros, científicos y desarrolladores que lideran la innovación en todos los ámbitos. Aunque es una región pacífica, mantiene una preparación militar constante respaldada por tecnología avanzada. Desde aquí se diseña y distribuye la maquinaria más sofisticada, convirtiéndola en un pilar esencial para el desarrollo global.',
   imagen: './images/medellthor.png',
@@ -115,7 +115,7 @@ const HOTSPOTS = [
   {
     id:     'dravencross2',
     top:    '76%',
-    left:   '38.8%',
+    left:   '37.7%',
     nombre: 'Dravencross Norte',
     desc:   'Una extensión desértica donde se concentran grandes operaciones de extracción automatizada. A diferencia del sur, aquí predominan instalaciones fijas controladas por sistemas mecánicos autónomos. La población humana es mínima y se limita a supervisores técnicos.',
     imagen: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&h=338&fit=crop',
@@ -135,7 +135,7 @@ const HOTSPOTS = [
   {
     id:     'brumhollow',
     top:    '94.2%',
-    left:   '32.3%',
+    left:   '30.6%',
     nombre: 'brumhollow',
     desc:   'Una zona periférica con baja visibilidad constante debido a emisiones industriales. La población vive en asentamientos cerrados y depende de sistemas de filtración de aire. La mayoría trabaja en plantas de procesamiento o reciclaje de materiales.',
     imagen: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&h=338&fit=crop',
