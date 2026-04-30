@@ -1,0 +1,694 @@
+/* ================================================================
+   MAPA INTERACTIVO RPG — mapa.css
+   Fuentes requeridas: Cinzel + Crimson Text (Google Fonts)
+   Diseño: oscuro, elegante, estilo videojuego de fantasía
+================================================================ */
+
+/* ---------------------------------------------------------------
+   1. VARIABLES GLOBALES
+--------------------------------------------------------------- */
+:root {
+  /* Paleta */
+  --c-bg:          #08070a;
+  --c-panel-bg:    #222;
+  --c-border:      #2e2540;
+  --c-border-glow: #4a3a6a;
+  --c-gold:        #c8a84b;
+  --c-gold-dim:    #7a6530;
+  --c-gold-bright: #f0d878;
+  --c-amber:       #e07830;
+  --c-teal:        #3ab8b0;
+  --c-text:        #e2d8c8;
+  --c-text-dim:    #8a7a6a;
+  --c-text-faint:  #4a3e30;
+
+  /* Hotspot pulse colors */
+  --c-pulse:       rgba(200, 168, 75, 0.6);
+  --c-pulse-outer: rgba(200, 168, 75, 0.15);
+
+  /* Dimensiones */
+  --panel-w:       340px;
+  --header-h:      64px;
+  --border-radius: 2px;
+
+  /* Transiciones */
+  --transition-fast:   0.18s ease;
+  --transition-mid:    0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Sombras */
+  --shadow-panel:  0 0 60px rgba(0,0,0,0.8), 0 0 120px rgba(0,0,0,0.4);
+  --shadow-glow:   0 0 16px rgba(200,168,75,0.4);
+}
+
+/* ---------------------------------------------------------------
+   2. RESET SCOPED (solo dentro del componente)
+--------------------------------------------------------------- */
+#mapa-interactivo *,
+#mapa-interactivo *::before,
+#mapa-interactivo *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#mapa-interactivo {
+  /* El componente se adapta al ancho de su contenedor padre */
+  width: 100%;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+
+  /* Borde decorativo exterior */
+  border: 1px solid var(--c-border);
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.6),
+    0 4px 40px rgba(0,0,0,0.6);
+
+  /* Patrón de textura sutil */
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 0%, #16112a 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='rgba(255,255,255,0.015)'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------
+   3. HEADER
+--------------------------------------------------------------- */
+.mapa-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: var(--header-h);
+  padding: 0 24px;
+  background: linear-gradient(180deg,
+    rgba(30, 20, 50, 0.95) 0%,
+    rgba(14, 10, 22, 0.9) 100%);
+  border-bottom: 1px solid var(--c-border);
+  position: relative;
+  z-index: 10;
+}
+
+/* Línea de luz superior */
+.mapa-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--c-gold-dim) 30%,
+    var(--c-gold) 50%,
+    var(--c-gold-dim) 70%,
+    transparent 100%);
+}
+
+.mapa-header__titulo {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  text-shadow:
+    0 0 20px rgba(200,168,75,0.5),
+    0 1px 0 rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+
+/* Ornamentos laterales tipo Art Deco */
+.mapa-header__ornament {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--c-gold-dim) 60%,
+    var(--c-gold) 100%
+  );
+  position: relative;
+}
+.mapa-header__ornament.right {
+  transform: scaleX(-1);
+}
+.mapa-header__ornament::before {
+  content: '◈';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  color: var(--c-gold);
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------
+   4. LAYOUT PRINCIPAL
+--------------------------------------------------------------- */
+.mapa-layout {
+  display: flex;
+  position: relative;
+  /* Altura del componente: ajusta este valor según necesites */
+  height: clamp(400px, 60vw, 680px);
+}
+
+/* ---------------------------------------------------------------
+   5. CONTENEDOR DEL MAPA
+--------------------------------------------------------------- */
+.mapa-contenedor {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: #0d1018;
+
+  /* La imagen de fondo la aplica JS, pero definimos el estilo aquí */
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* Cursor personalizado tipo pergamino */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='10' y1='2' x2='10' y2='6' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='10' y1='14' x2='10' y2='18' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='2' y1='10' x2='6' y2='10' stroke='%23c8a84b' stroke-width='1.5'/%3E%3Cline x1='14' y1='10' x2='18' y2='10' stroke='%23c8a84b' stroke-width='1.5'/%3E%3C/svg%3E") 10 10, crosshair;
+}
+
+/* Viñeta que oscurece los bordes del mapa */
+.mapa-overlay-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 85% 85% at 50% 50%,
+      transparent 40%,
+      rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Efecto hover en el mapa completo */
+.mapa-contenedor:hover .mapa-overlay-vignette {
+  background:
+    radial-gradient(ellipse 85% 85% at 50% 50%,
+      transparent 50%,
+      rgba(0,0,0,0.5) 100%);
+  transition: background var(--transition-mid);
+}
+
+/* ---------------------------------------------------------------
+   6. HOTSPOTS
+--------------------------------------------------------------- */
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  cursor: pointer;
+
+  /* Tamaño del área clicable */
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ícono central (el punto visible) */
+.hotspot__icono {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  border: 2px solid var(--c-gold-bright);
+  box-shadow:
+    0 0 8px var(--c-pulse),
+    0 0 0 4px rgba(200,168,75,0.15);
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+  z-index: 2;
+}
+
+/* Diamond shape para algunos hotspots (clase opcional) */
+.hotspot.diamond .hotspot__icono {
+  border-radius: 2px;
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+}
+.hotspot.diamond:hover .hotspot__icono {
+  transform: rotate(45deg) scale(1.3);
+}
+
+/* Anillo de pulse externo (animación continua) */
+.hotspot__pulse {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--c-gold);
+  opacity: 0;
+  animation: hotspot-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Segundo anillo con delay */
+.hotspot__pulse2 {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--c-gold);
+  opacity: 0;
+  animation: hotspot-pulse 2.4s ease-out infinite 0.8s;
+  pointer-events: none;
+}
+
+@keyframes hotspot-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Etiqueta flotante del nombre */
+.hotspot__label {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(200,168,75,0.3);
+
+  background: rgba(8, 6, 14, 0.82);
+  border: 1px solid rgba(200,168,75,0.3);
+  padding: 3px 8px;
+
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+/* Flecha hacia abajo de la etiqueta */
+.hotspot__label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: rgba(200,168,75,0.3);
+}
+
+/* ESTADOS HOVER */
+.hotspot:hover .hotspot__icono {
+  transform: scale(1.5);
+  background: var(--c-gold-bright);
+  box-shadow:
+    0 0 16px rgba(200,168,75,0.8),
+    0 0 32px rgba(200,168,75,0.3),
+    0 0 0 6px rgba(200,168,75,0.15);
+}
+
+.hotspot:hover .hotspot__label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.hotspot:hover .hotspot__pulse,
+.hotspot:hover .hotspot__pulse2 {
+  border-color: var(--c-gold-bright);
+  animation-duration: 1.4s;
+}
+
+/* ESTADO ACTIVO (seleccionado) */
+.hotspot.activo .hotspot__icono {
+  background: var(--c-amber);
+  border-color: #ffb060;
+  box-shadow:
+    0 0 20px rgba(224,120,48,0.8),
+    0 0 40px rgba(224,120,48,0.3),
+    0 0 0 8px rgba(224,120,48,0.12);
+  animation: hotspot-selected 1s ease-in-out infinite alternate;
+}
+
+.hotspot.activo .hotspot__label {
+  opacity: 1;
+  color: var(--c-amber);
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes hotspot-selected {
+  from { transform: scale(1.4); }
+  to   { transform: scale(1.7); }
+}
+
+/* Stagger de entrada (aplicado vía JS con delay inline) */
+.hotspot {
+  animation: hotspot-enter 0.5s ease both;
+}
+@keyframes hotspot-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------
+   7. PANEL LATERAL
+--------------------------------------------------------------- */
+.mapa-panel {
+  width: 0;
+  flex-shrink: 0;
+  background: var(--c-panel-bg);
+  border-left: 1px solid var(--c-border);
+  overflow: hidden;
+  position: relative;
+  transition: width var(--transition-slow);
+
+  display: flex;
+  flex-direction: column;
+
+  /* Luz de borde izquierdo */
+  box-shadow: var(--shadow-panel);
+}
+
+/* Panel abierto */
+.mapa-panel.abierto {
+  width: var(--panel-w);
+  border-left-color: var(--c-border-glow);
+}
+
+/* Textura del panel */
+.mapa-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(74, 58, 106, 0.08) 0%,
+      transparent 40%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M30 0v60M0 30h60' stroke='rgba(255,255,255,0.012)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Botón cerrar */
+.panel-cerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  background: transparent;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-dim);
+  font-size: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  border-radius: var(--border-radius);
+}
+.panel-cerrar:hover {
+  color: var(--c-gold);
+  border-color: var(--c-gold-dim);
+  background: rgba(200,168,75,0.08);
+}
+
+/* Imagen del territorio */
+.panel-imagen-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #0a0a0f;
+}
+
+.panel-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity var(--transition-mid);
+}
+
+.panel-imagen.cargada {
+  opacity: 1;
+}
+
+/* Degradado sobre la imagen */
+.panel-imagen-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 40%,
+    var(--c-panel-bg) 100%
+  );
+  pointer-events: none;
+}
+
+/* Sin imagen: placeholder */
+.panel-imagen-wrap.sin-imagen {
+  aspect-ratio: auto;
+  height: 0;
+}
+
+/* Cuerpo del panel */
+.panel-cuerpo {
+  padding: 20px 22px 24px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Scrollbar estilizada */
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) transparent;
+}
+.panel-cuerpo::-webkit-scrollbar { width: 3px; }
+.panel-cuerpo::-webkit-scrollbar-thumb { background: var(--c-border); }
+
+.panel-etiqueta {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--c-gold-dim);
+  margin-bottom: 6px;
+}
+
+.panel-titulo {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 900;
+  color: var(--c-gold);
+  line-height: 1.2;
+  text-shadow: 0 0 20px rgba(200,168,75,0.3);
+  margin-bottom: 14px;
+}
+
+/* Divisor decorativo */
+.panel-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.panel-divider__linea {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-border));
+}
+.panel-divider__linea:last-child {
+  background: linear-gradient(90deg, var(--c-border), transparent);
+}
+.panel-divider__icono {
+  color: var(--c-gold-dim);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* Descripción */
+.panel-desc {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--c-text);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+/* Stats / datos adicionales */
+.panel-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-size: 0.82rem;
+}
+.panel-stats dt {
+  color: var(--c-gold-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.panel-stats dd {
+  color: var(--c-text);
+}
+
+/* Animación de entrada del contenido del panel */
+.mapa-panel.abierto .panel-cuerpo > * {
+  animation: panel-content-in 0.4s ease both;
+}
+.mapa-panel.abierto .panel-etiqueta  { animation-delay: 0.15s; }
+.mapa-panel.abierto .panel-titulo    { animation-delay: 0.2s; }
+.mapa-panel.abierto .panel-divider   { animation-delay: 0.25s; }
+.mapa-panel.abierto .panel-desc      { animation-delay: 0.3s; }
+.mapa-panel.abierto .panel-stats     { animation-delay: 0.35s; }
+
+@keyframes panel-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------------------------------------------
+   8. OVERLAY DE CIERRE (móvil)
+--------------------------------------------------------------- */
+.mapa-overlay-cierre {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity var(--transition-mid);
+}
+.mapa-overlay-cierre.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------
+   9. ESTADO DE CARGA (mientras carga la imagen)
+--------------------------------------------------------------- */
+.mapa-contenedor.cargando::after {
+  content: 'Cargando mapa…';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: var(--c-gold-dim);
+  z-index: 4;
+}
+
+/* ---------------------------------------------------------------
+   10. RESPONSIVE
+--------------------------------------------------------------- */
+
+/* Tablet: panel encima del mapa */
+@media (max-width: 768px) {
+  .mapa-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .mapa-contenedor {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    height: auto;
+  }
+
+  .mapa-panel {
+    width: 100% !important;
+    max-height: 0;
+    border-left: none;
+    border-top: 1px solid var(--c-border);
+    transition: max-height var(--transition-slow);
+  }
+
+  .mapa-panel.abierto {
+    width: 100% !important;
+    max-height: 400px;
+  }
+
+  .mapa-overlay-cierre {
+    display: none !important;
+  }
+
+  .panel-imagen-wrap {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* Móvil: panel como drawer desde abajo */
+@media (max-width: 480px) {
+  .mapa-header__titulo {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+  }
+
+  .mapa-contenedor {
+    aspect-ratio: 3 / 4;
+  }
+
+  /* Panel flotante sobre el mapa */
+  .mapa-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    max-height: 0;
+    border-top: 1px solid var(--c-border-glow);
+    z-index: 10;
+  }
+
+  .mapa-panel.abierto {
+    max-height: 70%;
+  }
+
+  .mapa-overlay-cierre {
+    display: block;
+    z-index: 9;
+  }
+}

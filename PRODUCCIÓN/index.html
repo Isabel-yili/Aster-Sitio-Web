@@ -6,6 +6,7 @@
   <meta name="description" content="ASTER - Universo Transmedia. La Memoria es un Arma. Descubre el domo, la resistencia y los secretos de una ciudad bajo control imperial.">
   <title>ASTER | Trabaja. Obedece. Prospera.</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="mapa.css">
   <style>
     /* ══════════════════════════════════════════
        VIDEO PANEL — estilo base de datos
@@ -939,6 +940,61 @@
 
   <hr class="section-divider">
 
+    <div id="mapa-interactivo">
+
+      <!-- Encabezado del mapa -->
+      <header class="mapa-header">
+        <div class="mapa-header__ornament left"></div>
+        <h1 class="mapa-header__titulo">El Mundo de Aster</h1>
+        <div class="mapa-header__ornament right"></div>
+      </header>
+
+      <!-- Área principal: mapa + panel lateral -->
+      <div class="mapa-layout">
+
+        <!-- Contenedor del mapa con hotspots -->
+        <div class="mapa-contenedor" id="mapa-contenedor">
+          <!-- La imagen de fondo se aplica vía CSS / JS -->
+          <!-- Los hotspots se inyectan aquí por JavaScript -->
+          <div class="mapa-overlay-vignette"></div>
+        </div>
+
+        <!-- Panel lateral de información (se abre al hacer clic) -->
+        <aside class="mapa-panel" id="mapa-panel" aria-hidden="true">
+          <!-- Botón cerrar -->
+          <button class="panel-cerrar" id="panel-cerrar" aria-label="Cerrar panel">✕</button>
+
+          <!-- Imagen del territorio -->
+          <div class="panel-imagen-wrap" id="panel-imagen-wrap">
+            <img class="panel-imagen" id="panel-imagen" src="" alt="" loading="lazy">
+            <div class="panel-imagen-gradient"></div>
+          </div>
+
+          <!-- Contenido textual -->
+          <div class="panel-cuerpo">
+            <p class="panel-etiqueta">— Territorio —</p>
+            <h2 class="panel-titulo" id="panel-titulo">Nombre del Reino</h2>
+            <div class="panel-divider">
+              <span class="panel-divider__linea"></span>
+              <span class="panel-divider__icono">⚔</span>
+              <span class="panel-divider__linea"></span>
+            </div>
+            <p class="panel-desc" id="panel-desc">Descripción del territorio.</p>
+
+            <!-- Datos extra opcionales (se rellenan si existen en el hotspot) -->
+            <dl class="panel-stats" id="panel-stats"></dl>
+          </div>
+        </aside>
+
+      </div><!-- /mapa-layout -->
+
+      <!-- Overlay de cierre (clic fuera del panel en móvil) -->
+      <div class="mapa-overlay-cierre" id="mapa-overlay-cierre"></div>
+
+  </div>
+
+  <hr class="section-divider">
+
   <!-- ══ 4. ACCESO OBRA NUCLEO — REPOSITORIO ══ -->
   <section class="section reveal" id="acceso">
     <div class="section__header">
@@ -1275,5 +1331,6 @@
       }
     }
   </script>
+  <script src="mapa.js"></script>
 </body>
 </html>
