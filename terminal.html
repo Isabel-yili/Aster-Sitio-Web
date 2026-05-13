@@ -6,6 +6,7 @@
   <meta name="description" content="Terminal Imperial de ASTER - Sistema Social, Estructura Política, Economía y documentos clasificados del Domo.">
   <title>ASTER | Terminal Imperial</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
   <style>
     /* ── STAT GRID ── */
     .stat-grid {
@@ -464,7 +465,7 @@
       border: 1px solid rgba(57,255,20,.15);
       position: relative;
     }
-    .chip-diagram__body-svg { width: 100%; max-width: 100%; opacity: .9; display: block; }
+    .chip-diagram__body-svg { width: min(260px, 80%); opacity: .9; }
     .chip-diagram__label {
       font-family: var(--font-code);
       font-size: .7rem;
@@ -811,6 +812,99 @@
       80% { transform: translateX(6px); }
     }
     .shake { animation: shake .4s ease; }
+
+    /* ── VERIN SISTEMA MONETARIO ── */
+    .verin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .verin-card {
+      background: rgba(0,5,0,.8);
+      border: 1px solid rgba(57,255,20,.18);
+      padding: var(--space-lg);
+      transition: border-color .3s, box-shadow .3s;
+      position: relative;
+    }
+    .verin-card:hover {
+      border-color: rgba(57,255,20,.45);
+      box-shadow: 0 0 18px rgba(57,255,20,.06);
+    }
+    .verin-card__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid rgba(57,255,20,.1);
+    }
+    .verin-coin {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 500;
+      flex-shrink: 0;
+      border: 2px solid;
+    }
+    .verin-coin--mayor  { background: rgba(218,165,32,.12); border-color: var(--brass);    color: var(--brass); }
+    .verin-coin--comun  { background: rgba(160,142,120,.1); border-color: var(--iron-light); color: var(--iron-light); }
+    .verin-coin--menor  { background: rgba(201,109,31,.1);  border-color: var(--copper);   color: var(--copper); }
+    .verin-coin--fragmento { background: rgba(90,74,56,.15); border-color: var(--iron-gray); color: var(--iron-gray); }
+    .verin-card__name {
+      font-family: var(--font-imperial);
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 4px;
+    }
+    .verin-card__badge {
+      font-family: var(--font-code);
+      font-size: .58rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border: 1px solid;
+    }
+    .verin-card__badge--gold   { color: var(--brass);      border-color: rgba(218,165,32,.4); }
+    .verin-card__badge--silver { color: var(--iron-light); border-color: rgba(160,142,120,.35); }
+    .verin-card__badge--copper { color: var(--copper);     border-color: rgba(201,109,31,.4); }
+    .verin-card__badge--bone   { color: var(--iron-gray);  border-color: rgba(90,74,56,.4); }
+    .verin-card__rate {
+      font-family: var(--font-code);
+      font-size: .72rem;
+      color: var(--green-neon);
+      letter-spacing: 1px;
+      margin-bottom: var(--space-sm);
+    }
+    .verin-card__desc {
+      font-family: var(--font-code);
+      font-size: .78rem;
+      color: var(--iron-light);
+      line-height: 1.75;
+      margin: 0;
+    }
+    .verin-truth {
+      margin-top: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(57,255,20,.04);
+      border: 1px solid rgba(57,255,20,.2);
+      border-left: 3px solid var(--green-neon);
+      font-family: var(--font-code);
+      font-size: .78rem;
+      color: var(--iron-light);
+      line-height: 1.75;
+    }
+    .verin-truth__label {
+      display: block;
+      font-size: .6rem;
+      color: var(--green-neon);
+      letter-spacing: 3px;
+      margin-bottom: var(--space-sm);
+    }
   </style>
 </head>
 <body>
@@ -838,7 +932,7 @@
   <header class="page-header">
     <p class="page-header__breadcrumb"><a href="index.html">ASTER</a> / TERMINAL</p>
     <h1 class="page-header__title glitch" data-text="Terminal Imperial">Terminal Imperial</h1>
-    <p class="page-header__desc">Acceso autorizado a nodos del sistema imperial. Clasificación: restringida.</p>
+    <p class="page-header__desc">Acceso a los nodos del sistema imperial. Clasificación: Restringida.</p>
   </header>
 
   <main class="section">
@@ -907,24 +1001,28 @@
               <div class="flow-panel__sidebar">
                 <div class="flow-panel__sidebar-header">//&nbsp;FASES DEL PROCESO</div>
                 <div class="flow-panel__nav-item active" data-phase="phase-ext" onclick="switchFlowPhase(this, 'phase-ext')">
+                  <span class="flow-panel__nav-icon">⛏</span>
                   <div>
                     <div class="flow-panel__nav-step">FASE 01</div>
                     <div class="flow-panel__nav-label">Extracción</div>
                   </div>
                 </div>
                 <div class="flow-panel__nav-item" data-phase="phase-ref" onclick="switchFlowPhase(this, 'phase-ref')">
+                  <span class="flow-panel__nav-icon">🏭</span>
                   <div>
                     <div class="flow-panel__nav-step">FASE 02</div>
                     <div class="flow-panel__nav-label">Procesamiento</div>
                   </div>
                 </div>
                 <div class="flow-panel__nav-item" data-phase="phase-dist" onclick="switchFlowPhase(this, 'phase-dist')">
+                  <span class="flow-panel__nav-icon">🚢</span>
                   <div>
                     <div class="flow-panel__nav-step">FASE 03</div>
                     <div class="flow-panel__nav-label">Distribución</div>
                   </div>
                 </div>
                 <div class="flow-panel__nav-item" data-phase="phase-int" onclick="switchFlowPhase(this, 'phase-int')">
+                  <span class="flow-panel__nav-icon">💰</span>
                   <div>
                     <div class="flow-panel__nav-step">FASE 04</div>
                     <div class="flow-panel__nav-label">Integración</div>
@@ -976,6 +1074,75 @@
             </div>
 
             <p>Cada etapa es supervisada para asegurar la máxima eficiencia operativa y el equilibrio entre producción, consumo interno y proyección exterior.</p>
+          </div>
+        </div>
+
+        <!-- ══ NODO-ECO-002B: SISTEMA MONETARIO ══ -->
+        <div class="node reveal">
+          <div class="node__header">
+            <span class="node__id">NODO-ECO-002B</span>
+            <span class="node__status">ACTIVO</span>
+          </div>
+          <h3 class="node__title">Sistema Monetario — El Verin</h3>
+          <div class="node__content">
+            <p>La moneda oficial del Imperio toma su nombre del propio Veridium. Cuatro denominaciones físicas, distribuidas de forma asimétrica según zona: las más altas circulan exclusivamente dentro del Domo; las más bajas son el único medio de intercambio anónimo que escapa al sistema de rastreo imperial.</p>
+
+            <div class="verin-grid">
+
+              <div class="verin-card">
+                <div class="verin-card__header">
+                  <div class="verin-coin verin-coin--mayor">◈</div>
+                  <div>
+                    <div class="verin-card__name">Verin Mayor</div>
+                    <span class="verin-card__badge verin-card__badge--gold">Aleación de oro</span>
+                  </div>
+                </div>
+                <div class="verin-card__rate">1 Verin Mayor = 10 Verin Comunes</div>
+                <p class="verin-card__desc">Aleación de oro con trazas de Veridium — le da un leve iridiscente al borde. Solo circula dentro del Domo y en transacciones de alto valor entre comerciantes establecidos. En el capítulo 1, Cael deja cuatro: es una deuda seria.</p>
+              </div>
+
+              <div class="verin-card">
+                <div class="verin-card__header">
+                  <div class="verin-coin verin-coin--comun">◇</div>
+                  <div>
+                    <div class="verin-card__name">Verin Común</div>
+                    <span class="verin-card__badge verin-card__badge--silver">Plata</span>
+                  </div>
+                </div>
+                <div class="verin-card__rate">1 Verin Común = 8 Verin Menores</div>
+                <p class="verin-card__desc">La moneda de transacción cotidiana del Domo. Existe en los suburbios pero es menos frecuente — llegar a tener algunos es señal de que alguien tiene trabajo constante o acaba de cobrar una deuda.</p>
+              </div>
+
+              <div class="verin-card">
+                <div class="verin-card__header">
+                  <div class="verin-coin verin-coin--menor">⬡</div>
+                  <div>
+                    <div class="verin-card__name">Verin Menor</div>
+                    <span class="verin-card__badge verin-card__badge--copper">Cobre</span>
+                  </div>
+                </div>
+                <div class="verin-card__rate">1 Verin Menor = 5 Fragmentos</div>
+                <p class="verin-card__desc">La moneda del suburbio por excelencia. Compra comida, paga una noche de techo, cubre una deuda pequeña. Las dos monedas de cobre que Linet encuentra en el bolsillo de Cael son Verin Menores — no alcanzan para nada.</p>
+              </div>
+
+              <div class="verin-card">
+                <div class="verin-card__header">
+                  <div class="verin-coin verin-coin--fragmento">∷</div>
+                  <div>
+                    <div class="verin-card__name">Fragmento</div>
+                    <span class="verin-card__badge verin-card__badge--bone">Hueso / metal gris</span>
+                  </div>
+                </div>
+                <div class="verin-card__rate">Denominación mínima</div>
+                <p class="verin-card__desc">Moneda de emergencia. Legalmente acuñada pero el Imperio la llama <em>"transitoria"</em> — técnicamente no debería existir de forma permanente, pero existe hace generaciones en los suburbios. Hecha de metal recuperado de las minas, sin trazas de Veridium.</p>
+              </div>
+
+            </div><!-- /verin-grid -->
+
+            <div class="verin-truth">
+              <span class="verin-truth__label">// DATO NO REGISTRADO</span>
+              Solo las monedas con Veridium en su aleación —el Verin Mayor y el Verin Común— pueden ser verificadas por los escáneres imperiales. El Verin Menor y el Fragmento son legales pero no rastreables: la única forma de pago verdaderamente anónima dentro de Aster.
+            </div>
           </div>
         </div>
 
@@ -1159,18 +1326,23 @@
               <div class="dir-panel__sidebar">
                 <div class="dir-panel__sidebar-header">//&nbsp;ENTIDADES</div>
                 <div class="dir-panel__nav-item active" onclick="switchDirEntity(this, 'dir-soberano')">
+                  <span class="dir-panel__nav-icon">👑</span>
                   <div class="dir-panel__nav-label">El Soberano</div>
                 </div>
                 <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-consejo')">
+                  <span class="dir-panel__nav-icon">⚖</span>
                   <div class="dir-panel__nav-label">Alto Consejo</div>
                 </div>
                 <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-prefecturas')">
+                  <span class="dir-panel__nav-icon">🏛</span>
                   <div class="dir-panel__nav-label">Prefecturas</div>
                 </div>
                 <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-forja')">
+                  <span class="dir-panel__nav-icon">⚙</span>
                   <div class="dir-panel__nav-label">F.O.R.J.A</div>
                 </div>
                 <div class="dir-panel__nav-item" onclick="switchDirEntity(this, 'dir-uii')">
+                  <span class="dir-panel__nav-icon">📡</span>
                   <div class="dir-panel__nav-label">Unidad de Integridad</div>
                 </div>
               </div>
@@ -1334,7 +1506,22 @@
         <p style="font-family:var(--font-code);font-size:.82rem;color:var(--iron-light);line-height:1.9;margin-bottom:var(--space-md)">El <strong style="color:var(--bronze-light)">Chip de Identificación Imperial</strong> es presentado a la población como una capacidad biológica del linaje puro: la creencia oficial es que el Domo reconoce la sangre. En realidad, el Domo reconoce el chip.</p>
 
         <div class="chip-diagram">
-          <img src="assets/img/img_chip.png" alt="Diagrama del chip ciudadano" class="chip-diagram__body-svg" style="object-fit:contain;">
+          <svg class="chip-diagram__body-svg" viewBox="0 0 200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="50" rx="40" ry="42" fill="rgba(90,74,56,.3)" stroke="rgba(218,165,32,.4)" stroke-width="1"/>
+            <rect x="68" y="88" width="64" height="160" rx="4" fill="rgba(90,74,56,.3)" stroke="rgba(218,165,32,.4)" stroke-width="1"/>
+            <ellipse cx="62" cy="98" rx="18" ry="12" fill="rgba(90,74,56,.2)" stroke="rgba(218,165,32,.3)" stroke-width="1"/>
+            <ellipse cx="138" cy="98" rx="18" ry="12" fill="rgba(90,74,56,.2)" stroke="rgba(218,165,32,.3)" stroke-width="1"/>
+            <rect x="44" y="108" width="18" height="90" rx="8" fill="rgba(90,74,56,.2)" stroke="rgba(218,165,32,.3)" stroke-width="1"/>
+            <rect x="138" y="108" width="18" height="90" rx="8" fill="rgba(90,74,56,.2)" stroke="rgba(218,165,32,.3)" stroke-width="1"/>
+            <rect x="90" y="155" width="20" height="14" rx="2" fill="rgba(57,255,20,.2)" stroke="#39FF14" stroke-width="1.5"/>
+            <circle cx="100" cy="162" r="3" fill="#39FF14" opacity=".8"/>
+            <circle cx="100" cy="162" r="10" fill="none" stroke="#39FF14" stroke-width="1" opacity=".3">
+              <animate attributeName="r" from="10" to="20" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" from=".4" to="0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <line x1="110" y1="162" x2="150" y2="145" stroke="rgba(57,255,20,.5)" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="152" y="148" fill="#39FF14" font-family="monospace" font-size="8">CHIP</text>
+          </svg>
           <p class="chip-diagram__label">// UBICACIÓN REAL DEL IMPLANTE</p>
           <p class="chip-diagram__note">El chip no se implanta en el cuello como cree la población. Se inserta en la zona media de la espalda durante las primeras 48 horas de vida. Esta posición garantiza que el portador no pueda acceder a él ni extraerlo sin asistencia. Solo la cirugía imperial autorizada puede retirarlo — y ese procedimiento no existe para ciudadanos comunes.</p>
         </div>
@@ -1514,7 +1701,7 @@
     var errorEl = document.getElementById('mineCodeError');
     if (!input) return;
 
-    if (input.value.trim() === '8821') {
+    if (input.value.trim() === '0447') {
       mineUnlocked = true;
       document.getElementById('mineCodeGate').classList.remove('show');
       document.getElementById('mineRealContent').classList.add('show');

@@ -1,0 +1,1235 @@
+/* ================================================================
+   ASTER — responsive.css
+   Breakpoints:
+     Mobile S  : max-width 320px
+     Mobile M  : max-width 375px
+     Mobile L  : max-width 425px
+     Tablet    : max-width 768px
+   Se añade con <link rel="stylesheet" href="assets/css/responsive.css">
+   DESPUÉS del style.css principal en cada HTML.
+================================================================ */
+
+/* ---------------------------------------------------------------
+   VARIABLES RESPONSIVE
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  :root {
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-lg: 1.25rem;
+  }
+}
+
+@media (max-width: 425px) {
+  :root {
+    --space-xl: 1.5rem;
+    --space-2xl: 2.5rem;
+    --space-lg: 1rem;
+    --space-md: 0.75rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   1. SECCIÓN GLOBAL — padding y márgenes
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .section__header {
+    margin-bottom: var(--space-xl);
+  }
+  .section__desc {
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   2. NAVEGACIÓN
+--------------------------------------------------------------- */
+@media (max-width: 425px) {
+  .nav {
+    padding: var(--space-sm) var(--space-md);
+  }
+  .nav__logo {
+    font-size: 1.1rem;
+    letter-spacing: 4px;
+  }
+  .nav__logo::after {
+    font-size: 0.5rem;
+  }
+  .nav__links {
+    width: 85%;
+  }
+}
+
+@media (max-width: 320px) {
+  .nav__logo {
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   3. HERO SECTION (index.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .hero__title {
+    font-size: clamp(3rem, 16vw, 6rem);
+    letter-spacing: 10px;
+  }
+  .hero__subtitle {
+    font-size: clamp(0.65rem, 2.5vw, 0.9rem);
+    letter-spacing: 3px;
+  }
+  .hero__content {
+    padding: var(--space-md);
+  }
+  .hero__divider {
+    width: 140px;
+    margin: var(--space-md) auto;
+  }
+}
+
+@media (max-width: 425px) {
+  .hero__title {
+    font-size: clamp(2.5rem, 18vw, 4rem);
+    letter-spacing: 6px;
+  }
+  .hero__subtitle {
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+  }
+  .hero__scroll {
+    display: none;
+  }
+}
+
+@media (max-width: 320px) {
+  .hero__title {
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   4. PAGE HEADER (archivos.html, terminal.html, laboratorio.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 110px var(--space-md) var(--space-xl);
+  }
+  .page-header__title {
+    font-size: clamp(1.8rem, 8vw, 3rem);
+  }
+  .page-header__desc {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .page-header {
+    padding: 100px var(--space-md) var(--space-lg);
+  }
+  .page-header__title {
+    font-size: clamp(1.5rem, 9vw, 2.2rem);
+  }
+  .page-header__breadcrumb {
+    font-size: 0.6rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   5. CARDS
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  .card__image {
+    height: 180px;
+  }
+}
+
+@media (max-width: 425px) {
+  .card__image {
+    height: 150px;
+  }
+  .card__title {
+    font-size: 1.15rem;
+  }
+  .card__text {
+    font-size: 0.8rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   6. TABS (terminal.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .tabs__nav {
+    gap: 1px;
+  }
+  .tabs__btn {
+    font-size: 0.65rem;
+    padding: var(--space-sm) var(--space-md);
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 425px) {
+  .tabs__btn {
+    font-size: 0.58rem;
+    padding: 8px 10px;
+    letter-spacing: 0.5px;
+  }
+  .tabs__btn::before {
+    content: '';
+    margin: 0;
+  }
+}
+
+/* ---------------------------------------------------------------
+   7. NODES (terminal.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .node {
+    padding: var(--space-md);
+  }
+  .node__title {
+    font-size: 1.1rem;
+  }
+  .node__content {
+    font-size: 0.82rem;
+  }
+  .node__image {
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 425px) {
+  .node__header {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+  .node__title {
+    font-size: 1rem;
+  }
+  .node__content ul li {
+    font-size: 0.78rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   8. FICHA (terminal.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .ficha__row {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .ficha__key {
+    width: auto;
+    font-size: 0.65rem;
+  }
+  .ficha__val {
+    font-size: 0.82rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   9. COMPARE (archivos.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------------------------------------------------------
+   10. SPECTRAL FORM
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .spectral-form {
+    padding: var(--space-lg);
+  }
+  .spectral-form__group {
+    flex-direction: column;
+  }
+  .spectral-form__input,
+  .spectral-form__submit {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------
+   11. ECO GRID (index.html)
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .eco-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 425px) {
+  .eco-grid {
+    grid-template-columns: 1fr;
+  }
+  .eco-item__title {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   12. TERMINAL COMPONENT
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .terminal__body {
+    font-size: 0.72rem;
+    padding: var(--space-md);
+    max-height: 320px;
+  }
+  .terminal__input-group {
+    flex-wrap: wrap;
+  }
+  .terminal__input {
+    font-size: 0.75rem;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 425px) {
+  .terminal__body {
+    font-size: 0.65rem;
+  }
+}
+
+/* ---------------------------------------------------------------
+   13. GEAR CONTAINER — ocultar en móvil
+--------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .gear-container {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   14. BUTTONS
+--------------------------------------------------------------- */
+@media (max-width: 425px) {
+  .btn {
+    font-size: 0.7rem;
+    padding: var(--space-sm) var(--space-lg);
+    letter-spacing: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   15. PARTICLES — reducir en móvil (via JS, pero por si acaso)
+--------------------------------------------------------------- */
+@media (max-width: 425px) {
+  .particle {
+    display: none;
+  }
+  .particle:nth-child(-n+10) {
+    display: block;
+  }
+}
+
+/* ================================================================
+   INDEX.HTML — RESPONSIVE ESPECÍFICO
+================================================================ */
+
+/* VIDEO PANEL */
+@media (max-width: 768px) {
+  .video-panel__meta {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: var(--space-sm) var(--space-md);
+  }
+  .video-panel__meta-item {
+    font-size: 0.55rem;
+  }
+  .video-panel__bar {
+    padding: 8px var(--space-md);
+  }
+  .video-panel__bar-left {
+    gap: var(--space-sm);
+  }
+  .video-panel__title {
+    font-size: 0.58rem;
+    letter-spacing: 1px;
+  }
+  .video-panel__footer-text {
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .video-panel__meta {
+    display: none;
+  }
+  .video-panel__title {
+    font-size: 0.52rem;
+  }
+  .video-panel__badge {
+    font-size: 0.5rem;
+    padding: 2px 6px;
+  }
+}
+
+/* BENEFITS REPO */
+@media (max-width: 768px) {
+  .benefits-repo {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .benefits-repo__nav {
+    border-right: none;
+    border-bottom: 1px solid rgba(57,255,20,.15);
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .benefits-repo__nav::-webkit-scrollbar { display: none; }
+  .benefits-repo__nav-header { display: none; }
+  .benefits-repo__nav-item {
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: var(--space-sm) var(--space-md);
+  }
+  .benefits-repo__nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--green-neon);
+  }
+  .benefits-repo__nav-item.active::after { display: none; }
+  .benefits-repo__nav-num { display: none; }
+  .benefits-repo__nav-label {
+    font-size: 0.62rem;
+    white-space: nowrap;
+  }
+  .benefits-repo__content-bar {
+    padding: 8px var(--space-md);
+  }
+  .benefits-repo__path {
+    font-size: 0.55rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .benefits-repo__panel {
+    padding: var(--space-md);
+  }
+  .benefits-repo__entry-title {
+    font-size: 1rem;
+  }
+  .benefits-repo__entry-body {
+    font-size: 0.76rem;
+  }
+  .benefits-repo__img-placeholder {
+    aspect-ratio: 16/8;
+  }
+  .benefits-repo__footer {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .benefits-repo__nav-label {
+    font-size: 0.56rem;
+  }
+  .benefits-repo__entry-title {
+    font-size: 0.9rem;
+  }
+}
+
+/* REPO SYSTEM (acceso a obra) */
+@media (max-width: 768px) {
+  .repo-system__body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .repo-tree {
+    border-right: none;
+    border-bottom: 1px solid rgba(57,255,20,.12);
+  }
+  .repo-tree__file {
+    padding: 10px var(--space-md);
+    font-size: 0.68rem;
+  }
+  .repo-record {
+    padding: var(--space-md) var(--space-lg);
+  }
+  .repo-nucleus {
+    padding: var(--space-lg);
+  }
+  .repo-nucleus__title {
+    font-size: 1.2rem;
+  }
+  .repo-nucleus__desc {
+    font-size: 0.75rem;
+  }
+  .repo-record__title {
+    font-size: 1.1rem;
+  }
+  .repo-record__desc {
+    font-size: 0.75rem;
+  }
+  .repo-record__preview {
+    aspect-ratio: 16/7;
+  }
+  .repo-system__statusbar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+  .repo-system__statusbar-item {
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .repo-nucleus__title {
+    font-size: 1rem;
+  }
+  .repo-tree__file-name {
+    font-size: 0.62rem;
+  }
+  .repo-tree__file-badge {
+    font-size: 0.48rem;
+    padding: 1px 4px;
+  }
+}
+
+/* ================================================================
+   TERMINAL.HTML — RESPONSIVE ESPECÍFICO
+================================================================ */
+
+/* STAT GRID */
+@media (max-width: 768px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stat-box__num {
+    font-size: clamp(1.4rem, 5vw, 2rem);
+  }
+  .stat-box__label {
+    font-size: 0.58rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+  .stat-box {
+    padding: var(--space-md);
+  }
+}
+
+/* FLOW PANEL */
+@media (max-width: 768px) {
+  .flow-panel {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .flow-panel__sidebar {
+    border-right: none;
+    border-bottom: 1px solid rgba(57,255,20,.15);
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .flow-panel__sidebar::-webkit-scrollbar { display: none; }
+  .flow-panel__sidebar-header { display: none; }
+  .flow-panel__nav-item {
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: var(--space-sm) var(--space-md);
+  }
+  .flow-panel__nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--green-neon);
+    background: rgba(57,255,20,.08);
+  }
+  .flow-panel__nav-step { display: none; }
+  .flow-panel__nav-label { font-size: 0.62rem; white-space: nowrap; }
+  .flow-panel__content {
+    padding: var(--space-md);
+  }
+  .flow-panel__phase-img {
+    width: 100%;
+    max-width: 100%;
+    float: none;
+    margin: 0 0 var(--space-md) 0;
+    aspect-ratio: 16/8;
+    object-fit: cover;
+  }
+  .flow-panel__phase-title {
+    font-size: 1.1rem;
+  }
+  .flow-panel__phase-text {
+    font-size: 0.78rem;
+  }
+  .flow-panel__phase-notes {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .flow-panel__nav-item {
+    padding: var(--space-sm) 10px;
+  }
+  .flow-panel__nav-icon {
+    font-size: 0.9rem;
+  }
+  .flow-panel__nav-label {
+    font-size: 0.55rem;
+  }
+}
+
+/* DIRECTORY PANEL */
+@media (max-width: 768px) {
+  .dir-panel {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .dir-panel__sidebar {
+    border-right: none;
+    border-bottom: 1px solid rgba(57,255,20,.15);
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .dir-panel__sidebar::-webkit-scrollbar { display: none; }
+  .dir-panel__sidebar-header { display: none; }
+  .dir-panel__nav-item {
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: var(--space-sm) var(--space-md);
+  }
+  .dir-panel__nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--green-neon);
+  }
+  .dir-panel__nav-label { font-size: 0.6rem; white-space: nowrap; }
+  .dir-panel__content {
+    padding: var(--space-md);
+  }
+  .dir-panel__entity-img {
+    width: 100%;
+    max-width: 100%;
+    float: none;
+    margin: 0 0 var(--space-md) 0;
+    aspect-ratio: 16/8;
+    object-fit: cover;
+  }
+  .dir-panel__entity-title {
+    font-size: 1.1rem;
+  }
+  .dir-panel__entity-text {
+    font-size: 0.78rem;
+  }
+  .dir-panel__entity-notes {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .dir-panel__nav-item {
+    padding: var(--space-sm) 10px;
+  }
+  .dir-panel__nav-icon { font-size: 0.85rem; }
+  .dir-panel__nav-label { font-size: 0.54rem; }
+}
+
+/* TIMELINE */
+@media (max-width: 425px) {
+  .timeline {
+    padding-left: var(--space-lg);
+  }
+  .timeline__age {
+    font-size: 0.58rem;
+  }
+  .timeline__title {
+    font-size: 0.9rem;
+  }
+  .timeline__body {
+    font-size: 0.76rem;
+  }
+}
+
+/* VERIN GRID */
+@media (max-width: 768px) {
+  .verin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 425px) {
+  .verin-card__name {
+    font-size: 0.9rem;
+  }
+  .verin-card__desc {
+    font-size: 0.72rem;
+  }
+  .verin-coin {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+}
+
+/* MINE GLITCH */
+@media (max-width: 425px) {
+  .mine-glitch-wrap {
+    font-size: 0.75rem;
+    line-height: 1.7;
+  }
+  .mine-code-gate {
+    padding: var(--space-md);
+  }
+  .mine-code-gate__form {
+    flex-direction: column;
+  }
+  .mine-code-gate__input,
+  .mine-code-gate__btn {
+    width: 100%;
+  }
+}
+
+/* MONOPOLY PANEL */
+@media (max-width: 768px) {
+  .monopoly-panel {
+    width: min(98vw, 720px);
+    max-height: 90vh;
+  }
+  .monopoly-panel__body {
+    padding: var(--space-lg);
+  }
+  .monopoly-panel__content-title {
+    font-size: 1.1rem;
+  }
+  .monopoly-panel__text {
+    font-size: 0.78rem;
+  }
+}
+
+/* CHIP PANEL */
+@media (max-width: 768px) {
+  .chip-panel {
+    width: min(98vw, 780px);
+  }
+  .chip-panel__body {
+    padding: var(--space-lg);
+  }
+  .chip-diagram {
+    padding: var(--space-md);
+  }
+  .chip-diagram__body-svg {
+    width: min(200px, 60%);
+  }
+  .chip-diagram__note {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .chip-panel__body {
+    padding: var(--space-md);
+  }
+}
+
+/* ACCESS RESTRICTED */
+@media (max-width: 425px) {
+  .access-restricted__msg {
+    font-size: 1rem;
+  }
+  .access-restricted__sub {
+    font-size: 0.62rem;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ================================================================
+   ARCHIVOS.HTML — RESPONSIVE ESPECÍFICO
+================================================================ */
+
+/* VAULT GATE */
+@media (max-width: 768px) {
+  .vault-gate {
+    padding: var(--space-lg);
+  }
+  .vault-gate__title {
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+  }
+  .vault-gate__desc {
+    font-size: 0.7rem;
+  }
+  .vault-gate__form {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .vault-gate__input,
+  .vault-gate__btn {
+    width: 100%;
+  }
+}
+
+/* CORRUPT CARDS */
+@media (max-width: 768px) {
+  .corrupt-card {
+    padding: var(--space-md);
+  }
+  .corrupt-card__label {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+  }
+  .corrupt-card__scramble {
+    font-size: 0.72rem;
+    min-height: 60px;
+  }
+}
+
+/* CORRUPT PANEL / MODAL */
+@media (max-width: 768px) {
+  .corrupt-panel {
+    width: min(98vw, 860px);
+    max-height: 92vh;
+  }
+  .corrupt-panel__body {
+    padding: var(--space-lg);
+  }
+  .corrupt-panel__content {
+    font-size: 0.75rem;
+    padding: var(--space-md);
+  }
+  .corrupt-pw__form {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .corrupt-pw__input,
+  .corrupt-pw__btn {
+    width: 100%;
+    text-align: center;
+  }
+  .corrupt-panel__bar {
+    padding: 10px var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .corrupt-panel__title {
+    font-size: 0.58rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .corrupt-panel__body {
+    padding: var(--space-md);
+  }
+  .corrupt-panel__content {
+    font-size: 0.68rem;
+    line-height: 1.7;
+  }
+}
+
+/* CARNET GRID */
+@media (max-width: 768px) {
+  .carnet-grid {
+    grid-template-columns: 1fr;
+  }
+  .carnet__name {
+    font-size: 0.9rem;
+  }
+  .carnet__role {
+    font-size: 0.58rem;
+  }
+  .carnet__key {
+    width: 90px;
+    font-size: 0.6rem;
+  }
+  .carnet__val {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .carnet__rows {
+    font-size: 0.72rem;
+  }
+  .carnet__row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .carnet__key {
+    width: auto;
+  }
+}
+
+/* ASTERIA BLOCK */
+@media (max-width: 768px) {
+  .asteria-block {
+    padding: var(--space-lg);
+  }
+  .asteria-block__title {
+    font-size: 1.2rem;
+  }
+  .asteria-block__body {
+    font-size: 0.8rem;
+  }
+}
+
+/* AUDIO RECORD */
+@media (max-width: 768px) {
+  .audio-record__title {
+    font-size: 0.68rem;
+  }
+  .audio-record__meta {
+    font-size: 0.55rem;
+  }
+  .audio-record__transcript {
+    font-size: 0.73rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .audio-record__bar {
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+  .audio-record__title {
+    font-size: 0.6rem;
+  }
+}
+
+/* SYMBOL GRID */
+@media (max-width: 768px) {
+  .symbol-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 425px) {
+  .symbol-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .symbol-item__glyph {
+    font-size: 1.6rem;
+  }
+  .symbol-item__name {
+    font-size: 0.6rem;
+  }
+  .symbol-item__desc {
+    font-size: 0.7rem;
+  }
+}
+
+/* TREE GENEALÓGICO */
+@media (max-width: 768px) {
+  .tree {
+    font-size: 0.68rem;
+    padding: var(--space-md);
+    overflow-x: auto;
+  }
+  .tree-node {
+    font-size: 0.62rem;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+}
+
+/* ================================================================
+   LABORATORIO.HTML — RESPONSIVE ESPECÍFICO
+================================================================ */
+
+/* SEARCH BLOCK */
+@media (max-width: 768px) {
+  .search-block__bar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: 8px var(--space-md);
+  }
+  .search-block__title {
+    font-size: 0.58rem;
+  }
+  .search-block__body {
+    padding: var(--space-lg);
+  }
+  .search-block__prompt-line {
+    font-size: 0.65rem;
+    flex-wrap: wrap;
+  }
+  .search-block__form {
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 100%;
+  }
+  .search-block__input,
+  .search-block__btn {
+    width: 100%;
+  }
+  .search-block__input {
+    font-size: 0.85rem;
+  }
+  .search-block__footer {
+    font-size: 0.58rem;
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+@media (max-width: 425px) {
+  .search-block__body {
+    padding: var(--space-md);
+  }
+  .search-block__prompt-line {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+  }
+  .search-history__tag {
+    font-size: 0.6rem;
+    padding: 2px 8px;
+  }
+}
+
+/* RESULT PANEL */
+@media (max-width: 768px) {
+  .result-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .result-back-btn {
+    font-size: 0.62rem;
+    padding: 5px 12px;
+  }
+  .result-query-display {
+    font-size: 0.6rem;
+  }
+  .def-card__body {
+    padding: var(--space-lg);
+  }
+  .def-card__title {
+    font-size: 1.25rem;
+  }
+  .def-card__desc {
+    font-size: 0.78rem;
+    line-height: 1.8;
+  }
+  .def-meta-row {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .def-meta-item {
+    font-size: 0.58rem;
+  }
+  .report-card__body {
+    padding: var(--space-lg);
+  }
+  .report-card__title {
+    font-size: 1.2rem;
+  }
+  .report-card__text {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .def-card__body {
+    padding: var(--space-md);
+  }
+  .def-card__title {
+    font-size: 1.1rem;
+  }
+  .def-card__desc {
+    font-size: 0.74rem;
+  }
+  .report-card__body {
+    padding: var(--space-md);
+  }
+  .report-card__title {
+    font-size: 1rem;
+  }
+  .report-restricted__body {
+    padding: var(--space-md);
+  }
+  .report-restricted__msg {
+    font-size: 0.9rem;
+  }
+  .report-restricted__sub {
+    font-size: 0.6rem;
+  }
+  .noresult-card {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .noresult-card__line {
+    font-size: 0.72rem;
+  }
+}
+
+/* ================================================================
+   MAPA INTERACTIVO — RESPONSIVE ESPECÍFICO
+================================================================ */
+
+/* Mejoras al mapa.css ya existente para screens muy pequeñas */
+@media (max-width: 425px) {
+  #mapa-interactivo .mapa-header {
+    height: 48px;
+    gap: 10px;
+    padding: 0 12px;
+  }
+  #mapa-interactivo .mapa-header__titulo {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+  #mapa-interactivo .mapa-contenedor {
+    aspect-ratio: 1 / 1;
+  }
+  #mapa-interactivo .hotspot {
+    width: 28px;
+    height: 28px;
+  }
+  #mapa-interactivo .hotspot__icono {
+    width: 11px;
+    height: 11px;
+  }
+  #mapa-interactivo .hotspot__pulse,
+  #mapa-interactivo .hotspot__pulse2 {
+    width: 28px;
+    height: 28px;
+  }
+  #mapa-interactivo .hotspot__label {
+    font-size: 0.56rem;
+    padding: 2px 6px;
+  }
+  #mapa-interactivo .mapa-panel.abierto {
+    max-height: 55%;
+  }
+  #mapa-interactivo .panel-titulo {
+    font-size: 0.95rem;
+  }
+  #mapa-interactivo .panel-desc {
+    font-size: 0.82rem;
+  }
+  #mapa-interactivo .panel-stats {
+    font-size: 0.75rem;
+  }
+  #mapa-interactivo .panel-stats dt {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 320px) {
+  #mapa-interactivo .mapa-header__titulo {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  #mapa-interactivo .mapa-contenedor {
+    aspect-ratio: 3 / 4;
+  }
+  #mapa-interactivo .hotspot__label {
+    display: none;
+  }
+}
+
+/* ================================================================
+   FOOTER — RESPONSIVE
+================================================================ */
+@media (max-width: 768px) {
+  .footer {
+    padding: var(--space-lg) var(--space-md);
+  }
+  .footer__links {
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    justify-content: center;
+  }
+  .footer__links a {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .footer__logo {
+    font-size: 1rem;
+    letter-spacing: 6px;
+  }
+  .footer__text {
+    font-size: 0.6rem;
+  }
+}
+
+/* ================================================================
+   LOADER — RESPONSIVE
+================================================================ */
+@media (max-width: 425px) {
+  .loader__text {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+  }
+  .loader__bar {
+    width: 160px;
+  }
+}
+
+/* ================================================================
+   CONTACT OVERLAY (index.html)
+================================================================ */
+@media (max-width: 768px) {
+  #contactOverlay > div {
+    max-height: 92vh;
+    width: min(98vw, 620px) !important;
+  }
+}
+
+@media (max-width: 425px) {
+  #contactOverlay > div > div[style*="padding"] {
+    padding: var(--space-md) !important;
+  }
+}
+
+/* ================================================================
+   CORRECCIONES OVERFLOW & LEGIBILIDAD GLOBAL
+================================================================ */
+
+/* Evita scroll horizontal en todas las pantallas */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Imágenes responsivas */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tablas e iframes */
+iframe {
+  max-width: 100%;
+}
+
+/* Textos que pueden romper layout */
+@media (max-width: 425px) {
+  * {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Long letter-spacing en pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .nav__logo {
+    letter-spacing: 2px;
+  }
+  .hero__subtitle {
+    letter-spacing: 1px;
+    font-size: 0.58rem;
+  }
+}
